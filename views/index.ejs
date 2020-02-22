@@ -7,5 +7,26 @@
   <body>
     <h1><%= title %></h1>
     <p>Welcome to <%= title %></p>
+    <div style="width:300px;">
+      <% if (showList != undefined && showList.length == 0) { %>
+        <iframe width="500" height="315" src="https://www.youtube.com/embed/<%= showList[0].id.videoId %>" frameborder="0" allow="autoplay;encrypted=media" allowfullscreen></iframe>
+      <% } %>
+    </div>
+    
+    <div style="width:300px;">
+      <% if (searchList != undefined && searchList.length > 0) { %>
+        <% searchList.forEach(function(list){ %>
+          <!-- <pre ><%= JSON.stringify(list) %></pre> -->
+          <article>
+            <img src="<%= list.snippet.thumbnails.default.url %>" width="<%= list.snippet.thumbnails.default.width %>"  height="<%= list.snippet.thumbnails.default.height %>" alt="" class="thumb">
+            <div>
+              <h4><%= list.snippet.title %></h4>
+              <p><%= list.snippet.description %></p>
+            </div>
+          </article>
+        <% }) %>
+        <% } %>
+    </div>
+   
   </body>
 </html>
