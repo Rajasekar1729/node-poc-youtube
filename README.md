@@ -1,2 +1,2 @@
-# express-sequelize-node-app
+# Node POC Youtube
 Express with sequelize node application
