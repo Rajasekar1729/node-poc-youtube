@@ -1,32 +1,36 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
   <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="/stylesheets/login.css">
+
     <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
   <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-    <div style="width:300px;">
-      <% if (showList != undefined && showList.length == 0) { %>
-        <iframe width="500" height="315" src="https://www.youtube.com/embed/<%= showList[0].id.videoId %>" frameborder="0" allow="autoplay;encrypted=media" allowfullscreen></iframe>
-      <% } %>
+    <div class="login-page">
+        <div class="form">          
+          <form class="login-form" action="/login" method="post" name="form1">
+            <% if (ErrorDescription != '') { %>
+              <p style="color:red;margin-bottom: 10px;;"><%- ErrorDescription %></p>
+            <% } %>
+            <input type="text" placeholder="username" name="username" required/>
+            <input type="password" placeholder="password" name="password" required/>
+            <button type="submit">login</button>
+            <p class="message">Not registered? <a href="/createAccount">Create an account</a></p>            
+          </form>        
+        </div>
     </div>
-    
-    <div style="width:300px;">
-      <% if (searchList != undefined && searchList.length > 0) { %>
-        <% searchList.forEach(function(list){ %>
-          <!-- <pre ><%= JSON.stringify(list) %></pre> -->
-          <article>
-            <img src="<%= list.snippet.thumbnails.default.url %>" width="<%= list.snippet.thumbnails.default.width %>"  height="<%= list.snippet.thumbnails.default.height %>" alt="" class="thumb">
-            <div>
-              <h4><%= list.snippet.title %></h4>
-              <p><%= list.snippet.description %></p>
-            </div>
-          </article>
-        <% }) %>
-        <% } %>
-    </div>
-   
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
   </body>
 </html>

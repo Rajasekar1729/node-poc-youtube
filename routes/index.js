@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var user = require("../controllers/UserController.js");
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -62,7 +63,6 @@ function getNewToken(oauth2Client, callback) {
     access_type: 'offline',
     scope: SCOPES
   });
-  console.log('Authorize this app by visiting this url: ', authUrl);
   var rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
@@ -136,7 +136,6 @@ function getChannel(auth) {
     type: 'video',
     maxResults: 25
   }, (err, results) => {
-    console.log(err ? err.message : results);
     let dataItems = results.data.items;
     let firstList = [];
     let otherList = [];
@@ -150,10 +149,14 @@ function getChannel(auth) {
         }       
       }
     }
-    res.render('index', { title: 'Express', searchList: otherList, showList: firstList});
+    res.render('index', { title: 'Express', ErrorDescription: '', searchList: otherList, showList: firstList});
   });
  }
   
+});
+
+router.post('/login', (req,res) => {
+  user.loginValidation(req, res);
 });
 
 module.exports = router;
