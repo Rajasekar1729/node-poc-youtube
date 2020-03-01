@@ -531,7 +531,7 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
   /*-- responsive-design --*/
   @media(max-width:1440px) {
     input[type="text"], input[type="email"], input[type="password"] {
-      width: 94%;
+      width: 100%;
     }
   }
   

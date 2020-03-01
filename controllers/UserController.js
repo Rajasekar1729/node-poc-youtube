@@ -7,7 +7,7 @@ var userController = {};
 
 // Set The Storage Engine
 const storage = multer.diskStorage({
-  destination: 'public/ProfilePhotos',
+  destination: 'public/profile-photos',
   filename: function(req, file, cb){
     cb(null,file.fieldname + '-' + Date.now() + path.extname(file.originalname));
   }
@@ -61,9 +61,14 @@ userController.loginValidation = (req, res) => {
       }
     }).then(function(users) {            
       if(users.length > 0) {  
-        //req.session.LoggedIn = user[0];
-        //res.redirect("/users");      
-        res.render("index", { title: 'Login', IsError: false, ErrorDescription: "Login successfully."});
+        req.session.LoggedIn = users[0];
+        if(users[0].isSuperUser == true) {
+          res.redirect('/home');
+        } else if(users[0].isActive == true) {
+          res.redirect('/2f2-login');
+        } else {
+          res.render('index', { title: 'Login', IsError: true, ErrorDescription: "Unable to login Please contact adminstrator."});
+        }        
       } else {        
         res.render('index', { title: 'Login', IsError: true, ErrorDescription: "Unable to login Please signup."});
       }
