@@ -52,7 +52,7 @@ userController.list = (req, res) => {
 };
 
 // Show list of users
-userController.loginValidation = (req, res) => {
+userController.loginValidation = async (req, res) => {
   try {  
     const user = models.User.findAll({
       raw: true,
@@ -65,6 +65,7 @@ userController.loginValidation = (req, res) => {
         if(users[0].isSuperUser == true) {
           res.redirect('/home');
         } else if(users[0].isActive == true) {
+          const sendmail = await sendMail(users[0].email,"OTP for POC Login", "OTP is 652091");
           res.redirect('/2f2-login');
         } else {
           res.render('index', { title: 'Login', IsError: true, ErrorDescription: "Unable to login Please contact adminstrator."});
@@ -175,5 +176,36 @@ userController.photoUpload = (req, res) => {
     }
   });  
 };
+
+function sendMail(toMailId, subject, html) {
+  var transporterPayer = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    service: 'gmail',
+    auth: {
+    user: 'bossraju1729',
+    pass: 'Raju2020'
+    },
+    tls: {
+    rejectUnauthorized: false
+    }
+  });
+  
+  
+  mailOptions = {
+    from: "bossraju1729@gmail.com",
+    to: toMailId,
+    subject: subject,  
+    html: html
+  };
+  transporterPayer.sendMail(mailOptions, function(error, info) {
+    if (error) {
+    console.lo(error);
+    } else {
+    console.log("Email sent: " + info.response);
+    }
+  });
+}
 
 module.exports = userController;
