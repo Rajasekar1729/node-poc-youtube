@@ -1,53 +1,13 @@
-var User = require("../models/user");
 const models = require("../models");
-var multer = require('multer');
-var path = require('path');
-
-var userController = {};
-
-// Set The Storage Engine
-const storage = multer.diskStorage({
-  destination: 'public/profile-photos',
-  filename: function(req, file, cb){
-    cb(null,file.fieldname + '-' + Date.now() + path.extname(file.originalname));
-  }
-});
-
-// Init Upload
-const upload = multer({
-  storage: storage,
-  limits:{fileSize: 1000000},
-  fileFilter: function(req, file, cb){
-    checkFileType(file, cb);
-  }
-}).single('profilePhotoPath');
-
-// Check File Type
-function checkFileType(file, cb){
-  // Allowed ext
-  const filetypes = /jpeg|jpg|png|gif/;
-  // Check ext
-  const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-  // Check mime
-  const mimetype = filetypes.test(file.mimetype);
-
-  if(mimetype && extname){
-    return cb(null,true);
-  } else {
-    cb('Error: Images Only!');
-  }
-}
+let userController = {};
 
 // Show list of users
 userController.list = (req, res) => {
-  User.find({}).exec((err, users) => {
-    if (err) {
-      console.log("Error:", err);
-    }
-    else {
-      console.log("users", users)
-      res.render("../views/users/users", {userList: users});
-    }
+  const user = models.User.findAll({
+    raw: true
+  }).then(function(users) { 
+    console.log("users", users)
+    res.render("../views/users/users", {userList: users});
   });
 };
 
@@ -88,14 +48,12 @@ userController.logout = (req, res) => {
 
 // Show user by id
 userController.show = (req, res) => {
-  User.findOne({_id: req.params.id}).exec((err, user) => {
-    if (err) {
-      console.log("Error:", err);
-    }
-    else {
+    models.User.findOne(
+      {raw: true,
+      where: {id: req.params.id}
+    }).then(function(users) {            
       res.render("../views/users/edit", {user: user});
-    }
-  });
+    });
 };
 
 // Create new user
@@ -105,77 +63,57 @@ userController.create = (req, res) => {
 
 // Save new user
 userController.save = (req, res) => {
-  var user = new User(req.body);
-
-  user.save((err) => {
-    if(err) {
+  let request = req.body;
+  request["isActive"] = true;
+  request["isSuperUser"] = false;
+  models.User.create(request, { raw:true}).then(function(user) {
+    console.log("save users", user);
+    if(user != undefined && user.length == 0) {
       console.log(err);
       res.render("../views/createAccount");
     } else {
       console.log("Successfully created an user.");
       req.session.LoggedIn = user;
-      res.redirect("/users");
+      res.redirect("/home");
     }
-  });
+  });  
 };
 
 // Edit an user
 userController.edit = (req, res) => {
-  User.findOne({_id: req.params.id}).exec((err, user) => {
-    if (err) {
-      console.log("Error:", err);
-    }
-    else {
-      res.render("../views/users/edit", {user: user});
-    }
+  models.User.findOne(
+    {raw: true,
+    where: {id: req.params.id}
+  }).then(function(users) {            
+    res.render("../views/users/edit", {user: user});
   });
 };
 
 // Update an user
 userController.update = (req, res) => {
-  User.findByIdAndUpdate(req.params.id, { $set: { username: req.body.username, email: req.body.email, age: req.body.age }}, { new: true }, (err, user) => {
-    if (err) {
+  models.User.update({ username: req.body.username, email: req.body.email }, { raw: true,
+    where: {
+      id: req.params.id
+    }
+  }).then(function(user) {
+    if (user != undefined && user.length == 0) {
       console.log(err);
       res.render("../views/users/edit", {user: req.body});
-    }
-    res.redirect("/users");
+    } else {
+      res.redirect("/users");
+    }    
   });
 };
 
 // Delete an user
 userController.delete = (req, res) => {
-  User.remove({_id: req.params.id}, (err) => {
-    if(err) {
-      console.log(err);
+  models.User.destroy({
+    where: {
+      id: req.params.id
     }
-    else {
-      res.redirect("/users");
-    }
-  });
-};
-
-// Photo Upload an user
-userController.photoUpload = (req, res) => {
-  upload(req, res, (err) => {
-    if(err){
-      res.render('index', {
-        msg: err
-      });
-      console.log("Upload Err", err);
-    } else {
-      if(req.file == undefined){
-        console.log("No File");
-      } else {
-        User.findByIdAndUpdate(req.params.id, { $set: { profilePhotoPath: req.file.filename }}, { new: true }, (err, user) => {
-          if (err) {
-            console.log(err);
-            res.render("../views/users/edit", {user: req.body});
-          }
-          res.send("Picture saved");
-        });
-      }
-    }
-  });  
+  }).then((user) => {
+    res.redirect("/users");
+  })
 };
 
 function sendMail(toMailId, subject, html) {

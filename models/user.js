@@ -10,10 +10,10 @@ module.exports = (sequelize, DataTypes) => {
     isSuperUser: DataTypes.BOOLEAN
   }, {});
   User.associate = function(models) {
-    User.hasMany(models.User, {
-          foreignKey: 'user_id',
-          as: 'user'
-     });
+    // User.hasMany(models.User, {
+    //       foreignKey: 'user_id',
+    //       as: 'user'
+    //  });
   };
   return User;
 };
