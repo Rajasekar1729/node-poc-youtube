@@ -17,7 +17,7 @@
   <body>
     <div class="login-page">
         <div class="form">          
-          <form class="login-form" action="/login" method="post" name="form1">
+          <form class="login-form" action="/validation2f2Login" method="post" name="form1">
             <div style="width:100px; height: 44px; margin-left: 70px; padding-bottom: 14px;white-space: nowrap;">
               <svg viewBox="0 0 200 60" preserveAspectRatio="xMidYMid meet" focusable="false" class="style-scope ytd-topbar-logo-renderer" style="pointer-events: none; display: block; width: 100%; height: 100%;float: left;"><g viewBox="0 0 200 60" preserveAspectRatio="xMidYMid meet" class="style-scope ytd-topbar-logo-renderer">
                 <g class="style-scope ytd-topbar-logo-renderer">
@@ -66,8 +66,17 @@
             <% if (ErrorDescription != '') { %>
               <p style="color:red;margin-bottom: 10px;;"><%- ErrorDescription %></p>
             <% } %>
-            <input type="text" placeholder="Enter OTP" name="otp-pssword" required/>
-            <button type="submit">Submit</button>          
+            <% if (locals != undefined && locals.LoggedIn != undefined) { %>
+              <p style="text-align: center;font-weight: 600;margin-bottom: 10px;">Hi <%= locals.LoggedIn.firstname %> <%= locals.LoggedIn.lastname %></p>
+            <% } %>             
+            <% if (ErrorDescription == 'OTP is Expired') { %>
+              <input type="text" autocomplete="off" readonly placeholder="Enter OTP" name="otpPassword" required/>
+              <button type="submit" disabled>Submit</button>
+            <% } else { %>
+
+              <input type="text" autocomplete="off" placeholder="Enter OTP" name="otpPassword" required/>
+              <button type="submit">Submit</button>   
+            <% } %>       
           </form>        
         </div>
     </div>

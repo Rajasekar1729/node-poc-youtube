@@ -1,88 +1,50 @@
 <%- include('../layouts/header.ejs') %>
 
-<style>
-        .avatar-pic {
-    width: 150px;
-    }
-    </style>
-    <div class="container">
-        <div class="row">
-            <h2 class="text-center">Edit User</h2>
+
+    <div class="content">
+        <div class="row" style="padding-bottom: 10px;">
+            <u><h2 class="text-center">User Edit</h2></u>
         </div>
         <div class="row">
-            <div class="col-md-3">
-                    <form class="md-form">
-                            <div class="file-field">
-                              <div class="mb-4">
-                                <img id="imgContainer" src="<%= user.profilePhotoPath ? ('../../ProfilePhotos/' + user.profilePhotoPath) : 'https://mdbootstrap.com/img/Photos/Others/placeholder-avatar.jpg' %>"
-                                  class="rounded-circle z-depth-1-half avatar-pic" alt="example placeholder avatar">
-                              </div>
-                              <div class="d-flex justify-content-center">
-                                <input id="profilePhotoUpload" type="file" name="profilePhotoPath" accept="image/*" />
-                                <input id="imageUploadbtn" onclick="imgUploadFunction()" type="button" value="Upload Photo"/>
-                              </div>
-                            </div>
-                          </form>
-            </div>
-            <div class="col-md-9">
+            <div class="col-md-12">
                     <form action="/users/update/<%= user.id %>" method="post">
-                            <div class="form-group">
-                                    <label for="nametxt">UserName</label>
-                                    <input type="text" required name="username" class="form-control" id="nametxt" value="<%= user.username  %>" aria-describedby="text" placeholder="Enter name">                                
+                            <div class="form-group row">
+                              <div class="col-sm-6">
+                                <label for="nametxt">Username:</label>
+                                <input type="text" readonly name="username" class="form-control" id="nametxt" value="<%= user.username  %>" aria-describedby="text" placeholder="Enter name">                                
+                              </div>
+                              <div class="col-sm-6" style="margin-top: 28px;">
+                                <label for="activeChk">Active:</label>                                
+                                <input type="checkbox" required name="isActive" class="custom-control-label" id="activeChk" checked="<%= user.isActive  %>">
+                              </div> 
                             </div>
-                            <div class="form-group">
-                              <label for="emailtxt">Email address</label>
-                              <input type="email" required class="form-control" name="email" id="emailtxt" value="<%= user.email  %>" aria-describedby="emailHelp" placeholder="Enter email">
+                            <div class="form-group row">
+                              <div class="col-sm-6">
+                                <label for="emailtxt">Email address:</label>
+                                <input type="email" required class="form-control" name="email" id="emailtxt" value="<%= user.email  %>" aria-describedby="emailHelp" placeholder="Enter email">
+                              </div>                                    
+                            </div> 
+                            <div class="form-group row">
+                              <div class="col-sm-6">
+                                <label for="firstnametxt">Firstname:</label>
+                                <input type="text" required name="firstname" class="form-control" id="firstnametxt" value="<%= user.firstname  %>" aria-describedby="text" placeholder="Enter Firstname">                                
+                              </div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group row">
+                              <div class="col-sm-6">
+                                <label for="lastnametxt">Lastname:</label>
+                                <input type="text" required class="form-control" name="lastname" id="lastnametxt" value="<%= user.lastname  %>" aria-describedby="emailHelp" placeholder="Enter Lastname">
+                              </div>                                    
+                            </div>                               
+                            <!-- <div class="form-group">
                                     <label for="nametxt">Age</label>
                                     <input type="text" required class="form-control" id="agetxt" name="age" value="<%= user.age  %>" aria-describedby="text" placeholder="Enter age">                                
-                            </div>
+                            </div> -->
                             <button id="updateBtn" type="submit" class="btn btn-primary">Submit</button>
                     </form>
             </div>
         </div>
     </div>
     <input type="hidden" id="userId" name="userId" value="<%= user.id %>">
-    <script>      
-        $(document).ready(function () {         
-          $("#profilePhotoUpload").change(function() {
-            readURL(this);
-          });
-        });
-
-        function readURL(input) {
-            if (input.files && input.files[0]) {
-              var reader = new FileReader();
-              
-              reader.onload = function(e) {
-                $('#imgContainer').attr('src', e.target.result);
-              }
-              
-              reader.readAsDataURL(input.files[0]);
-            }
-          }
-
-        function imgUploadFunction() {
-          var file_data = $('#profilePhotoUpload').prop('files')[0];
-          var form_data = new FormData();
-          form_data.append('profilePhotoPath', file_data);
-          $.ajax({
-              url: '/users/photoUpload/' + $("#userId").val(), // point to server-side controller method
-              dataType: 'text', // what to expect back from the server
-              cache: false,
-              contentType: false,
-              processData: false,
-              data: form_data,
-              type: 'post',
-              success: function (response) {
-                  alert(response)
-              },
-              error: function (response) {
-                  alert(response)
-              }
-          });
-        }
-    </script>
 
 <%- include('../layouts/footer.ejs') %> 

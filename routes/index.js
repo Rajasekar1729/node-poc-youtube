@@ -164,8 +164,13 @@ router.get('/create-account', function(req, res) {
 	res.render('create-account', {title: 'Create Account', ErrorDescription: ''})
 })
 
-router.get('/2f2-login', function(req, res) {
-	res.render('2f2login', {title: '2F2 Login', ErrorDescription: ''})
+router.get('/2f2-login/:id', function(req, res) {
+	user.load2f2Login(req, res)
+	//res.render('2f2login', {title: '2F2 Login', ErrorDescription: ''})
+})
+
+router.post('/validation2f2Login', function(req, res) {
+	user.login2f2Validation(req, res);
 })
 
 router.get('/home', function(req, res) {
