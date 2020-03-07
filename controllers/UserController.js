@@ -52,12 +52,13 @@ userController.list = (req, res) => {
 };
 
 // Show list of users
-userController.loginValidation = async (req, res) => {
+userController.loginValidation = (req, res) => {
   try {  
     const user = models.User.findAll({
       raw: true,
       where: {
-        username: req.body.username
+        username: req.body.username,
+        password: req.body.password
       }
     }).then(function(users) {            
       if(users.length > 0) {  
@@ -65,7 +66,7 @@ userController.loginValidation = async (req, res) => {
         if(users[0].isSuperUser == true) {
           res.redirect('/home');
         } else if(users[0].isActive == true) {
-          const sendmail = await sendMail(users[0].email,"OTP for POC Login", "OTP is 652091");
+          const sendmail = sendMail(users[0].email,"OTP for POC Login", "OTP is 652091");
           res.redirect('/2f2-login');
         } else {
           res.render('index', { title: 'Login', IsError: true, ErrorDescription: "Unable to login Please contact adminstrator."});
@@ -206,6 +207,19 @@ function sendMail(toMailId, subject, html) {
     console.log("Email sent: " + info.response);
     }
   });
+}
+
+// Function to generate OTP 
+function generateOTP(user) { 
+  let string = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'; 
+  let OTP = ''; 
+  let len = string.length;
+  for (let i = 0; i < 6; i++ ) { 
+      OTP += string[Math.floor(Math.random() * len)]; 
+  } 
+  
+  let subject = "OTP";
+  let content = "<div><p>Hi " + user.firstname + " " + user.lastname +",</p><p>" + OTP + " is the One Time Pasword(OTP) for your login. Valid only for this login</p><p><a href='http://localhost:3000/2f2-login/"+ uuid +"'>Click here to login</a></p><div>"
 }
 
 module.exports = userController;
