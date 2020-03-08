@@ -68,6 +68,17 @@
     </g></svg>
     <span style="color: var(--yt-spec-text-secondary);margin: 0 0 0 2px;">POC</span>
   </div></a>
+  <div class="searchbox-container">
+    <div class="input-group">
+      <input type="text" class="form-control" placeholder="Search">
+      <div class="input-group-btn">
+        <button class="btn btn-default" type="submit">
+          <i class="glyphicon glyphicon-search"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
     <span style="float:right">
       <a class="navbar-brand" style="color:white; height: 60px; padding: 16px 16px; line-height: 26px;" href="#"><strong>Login as <%= locals.LoggedIn.firstname %> <%= locals.LoggedIn.lastname %></strong></a>
       <a href="/users/logout" title="Logout" class="btn btn-lg" style="color: #ffffff;font-size: 20px;padding: 16px 16px;">
@@ -78,7 +89,7 @@
 <!-- The sidebar -->
 <div class="sidebar">
     <a href="/home">Home</a>
-    <a href="#favorites">Favorites</a>
+    <a href="/favorites">Favorites</a>
     <% if (locals != undefined && locals.LoggedIn != undefined && locals.LoggedIn.isSuperUser == true) { %>
       <a href="/users">Users</a>
     <% } %>      
@@ -86,5 +97,10 @@
 <script>
   $(function() {
     $('.sidebar a[href^="/' + location.pathname.split("/")[1] + '"]').addClass('active');
+    if(location.pathname.split("/")[1] != "users") {
+      $('.searchbox-container').removeClass('display-none');
+    } else {
+      $('.searchbox-container').addClass('display-none');
+    }
   });
 </script>

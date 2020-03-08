@@ -177,4 +177,8 @@ router.get('/home', function(req, res) {
 	res.render('./youtube/home', {title: 'Home'})
 })
 
+router.get('/favorites', function(req, res) {
+	res.render('./youtube/favorites', {title: 'Favorites'})
+})
+
 module.exports = router;
