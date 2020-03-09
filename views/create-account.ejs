@@ -23,13 +23,15 @@
 		<div class="main-agileinfo">
 			<div class="agileits-top">
 				<form action="/users/save" method="post" name="createAccount">
-          <input class="text" type="text" name="username" autocomplete="off" placeholder="Username" required>
+          <input id="txtUsername" class="text" type="text" name="username" autocomplete="off" placeholder="Username" required autofocus>
+          <p id="divUsername" class="display-none" style="color:red;margin-top: 10px;text-align: left;padding-left: 10px;">Username Already Exist</p>
           <input style="width: 47.5%;float: left;margin-right: 20px;margin: 2em 1.3em 0em 0em;"  autocomplete="off" class="text" type="text" name="firstname" placeholder="First Name" required>
           <input style="width: 47.5%; margin: 2em 0 0;" class="text"  autocomplete="off" type="text" name="lastname" placeholder="Last Name" required>
 					<input class="text email" type="email" name="email"  autocomplete="off" placeholder="Email" required>
-					<input class="text" type="password" name="password"  autocomplete="off" placeholder="Password" required>
-					<input style="margin: 2em 0 0;" class="text w3lpass" type="password" name="confirmPassword" autocomplete="off" placeholder="Confirm Password" required>					
-					<input type="submit" value="SIGNUP">
+					<input  id="txtPassword" class="text" type="password" name="password"  autocomplete="off" placeholder="Password" required>
+          <input  id="txtConfirmPassword" style="margin: 2em 0 0;" class="text w3lpass" type="password" name="confirmPassword" autocomplete="off" placeholder="Confirm Password" required>					
+          <p id="divPassword" class="display-none" style="color:red;margin-top: 10px;text-align: left;padding-left: 10px;">Password not Match</p>
+					<input id="btnSubmit" type="submit" value="SIGNUP">
 				</form>
 				<p>Already have an Account? <a href="/"> Login Now!</a></p>
 			</div>
@@ -37,8 +39,60 @@
 	</div>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+    <script>
+      $(document).ready(function () {   
+        $("#btnSubmit").prop("disabled", true);      
+        $("#txtUsername").focusout(function(){
+
+          $.ajax({
+              url: '/users/usernameValidation/' + $("#txtUsername").val(), // point to server-side controller method
+              dataType: 'JSON', // what to expect back from the server
+              cache: false,
+              contentType: false,
+              processData: false,
+              type: 'get',
+              success: function (response) {
+                console.log(JSON.stringify(response)); 
+                if(response.IsError) {
+                  $("#divUsername").removeClass('display-none')
+                  $("#btnSubmit").prop("disabled", true);
+                } else {
+                  $("#divUsername").addClass('display-none');                  
+                  if($("#divPassword").hasClass('display-none')) {
+                    $("#btnSubmit").prop("disabled", false); 
+                  }
+                }
+                
+              },
+              error: function (response) {
+                console.log(response);
+              }
+          });
+        });
+        $("#txtConfirmPassword").keyup(function() {
+           console.log("txtConfirmPassword keyup");
+           if($("#txtPassword").val() != '' && $("#txtConfirmPassword").val() != '' && $("#txtConfirmPassword").val() == $("#txtPassword").val()) {                           
+              $("#btnSubmit").prop("disabled", false); 
+              $("#divPassword").addClass('display-none');
+            } else if($("#txtPassword").val() != '' && $("#txtConfirmPassword").val() != '') {
+              $("#btnSubmit").prop("disabled", true); 
+              $("#divPassword").removeClass('display-none');
+            }
+        });
+        $("#txtPassword").keyup(function(){
+          console.log("txtPassword keyup");
+            if($("#txtPassword").val() != '' && $("#txtConfirmPassword").val() != '' && $("#txtConfirmPassword").val() == $("#txtPassword").val()) {                           
+              $("#btnSubmit").prop("disabled", false);
+              $("#divPassword").addClass('display-none');
+            } else if($("#txtPassword").val() != '' && $("#txtConfirmPassword").val() != '') {
+              $("#btnSubmit").prop("disabled", true); 
+              $("#divPassword").removeClass('display-none');
+            }
+        });
+      });
+    </script>
   </body>
 </html>

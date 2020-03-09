@@ -3,6 +3,22 @@ const router = express.Router();
 const user = require("../controllers/UserController.js");
 const youtube = require("../controllers/YoutubeController.js");
 
+const auth = async (req, res, next) => {
+	if (req.session && req.session.LoggedIn != undefined) {
+	  const isActiveUser = await user.isCheckUserAcitve(req.session.LoggedIn.id);
+	  if(isActiveUser == true){
+		return next();
+	  }
+	  else {
+		res.redirect("/");
+	  }
+	}    
+	else {
+	  res.redirect("/");
+	}    
+  };
+  
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Youtube-POC', ErrorDescription: ''});
@@ -25,12 +41,12 @@ router.post('/validation2f2Login', function(req, res) {
 	user.login2f2Validation(req, res);
 })
 
-router.get('/home', function(req, res) {
+router.get('/home', auth, function(req, res) {
 	youtube.get(req, res);
 	//res.render('./youtube/home', {title: 'Home'})
 })
 
-router.get('/favorites', function(req, res) {
+router.get('/favorites', auth, function(req, res) {
 	res.render('./youtube/favorites', {title: 'Favorites'})
 })
 

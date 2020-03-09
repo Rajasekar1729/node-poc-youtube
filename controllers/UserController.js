@@ -172,7 +172,7 @@ function generateOTP(user,res) {
   let newUuid = uuidv4();
   
   let subject = "OTP";
-  let content = "<div><p>Hi " + user.firstname + " " + user.lastname +",</p><p>" + OTP + " is the One Time Pasword(OTP) for your login. Valid only for this login</p><p><a href='http://localhost:3000/2f2-login/"+ newUuid +"'>Click here to login</a></p><div>"
+  let content = "<div><p>Hi " + user.firstname + " " + user.lastname +",</p><p><b>" + OTP + "</b> is the One Time Pasword(OTP) for your login. Valid only for this login</p><p><a href='http://localhost:3000/2f2-login/"+ newUuid +"'>Click here to login</a></p><div>"
 
   let request = {
     uuid: newUuid,
@@ -219,6 +219,7 @@ userController.load2f2Login = (req, res) => {
       }
     }).then(function(dataObj) {               
       if(dataObj.length > 0) {
+        req.session.destroy();
         models.OTPEntries.findAll({
           raw: true,
           where: {
@@ -262,9 +263,15 @@ userController.load2f2Login = (req, res) => {
   }  
 };
 
-userController.saveValidation = (req, res) => {
-  let request = req.body;
-  
+userController.usernameValidation = async (req, res) => {
+  console.log("usernameValidation",req.params.id)
+  const isValid = await isValidUsername(req.params.id);
+  if(isValid == true) {
+    res.send({ isError: false , errorDescription: '' });
+  }
+  else {
+    res.send({ isError: true , errorDescription: 'Username Already Exist.' });
+  }
 };
 
 userController.isCheckUserAcitve = async (userId) => {
@@ -278,12 +285,12 @@ userController.isCheckUserAcitve = async (userId) => {
 async function isValidUsername(username) {
   let userlist = await models.User.findAll({raw: true});
   let filterUsername = userlist.filter((user) => {
-    if(user.username.lowercase() == username.lowercase()) {
+    if(user.username == username) {
       return user;
     }
   });
 
-  return (filterUsername.length > 0) ? true : false;
+  return (filterUsername.length > 0) ? false : true;
 }
 
 module.exports = userController;

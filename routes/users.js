@@ -38,6 +38,12 @@ router.post('/save',(req, res) => {
   user.save(req, res);
 });
 
+// Save validation
+router.get('/usernameValidation/:id',(req, res) => {
+  console.log("usernameValidation req", req);
+  user.usernameValidation(req, res);
+});
+
 // Edit user
 router.get('/edit/:id', auth,(req, res) => {
   user.edit(req, res);
