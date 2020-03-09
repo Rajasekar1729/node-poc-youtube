@@ -1,5 +1,6 @@
 const models = require("../models");
 let fs = require('fs');
+let path = require('path');
 let readline = require('readline');
 let {google} = require('googleapis');
 let OAuth2 = google.auth.OAuth2;
@@ -10,9 +11,8 @@ let authGlobal;
 // If modifying these scopes, delete your previously saved credentials
 // at ~/.credentials/youtube-nodejs-quickstart.json
 let SCOPES = ['https://www.googleapis.com/auth/youtube.readonly'];
-let TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH ||
-    process.env.USERPROFILE) + '/.credentials/';
-let TOKEN_PATH = TOKEN_DIR + 'youtube-nodejs-quickstart.json';
+let TOKEN_DIR = path.join(__dirname, '../.credentials');
+let TOKEN_PATH = TOKEN_DIR + '/youtube-nodejs-quickstart.json';
 console.log("TOKEN_PATH", TOKEN_PATH)
 // Load client secrets from a local file.
 fs.readFile('youtube-client-secret.json', function processClientSecrets(err, content) {
@@ -107,7 +107,7 @@ function storeToken(token) {
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
 function getChannel(auth) {
-  let service = google.youtube('v3');
+  //let service = google.youtube('v3');
   // service.channels.list({
   //   auth: auth,
   //   part: 'snippet,contentDetails,statistics',
@@ -129,36 +129,41 @@ function getChannel(auth) {
          
   //   }
   // });
-  console.log("auth ==>", auth)
-  service.search.list({
-    auth: auth,
-    part: 'snippet',
-    q: 'dogs',
-    type: 'video',
-    maxResults: 25
-  }, (err, results) => {
-    console.log("service err  =>>>>", err)
-    console.log("results", results)
-    if(results != undefined && results.data != undefined) {
-      let dataItems = results.data.items;
-      let firstList = [];
-      let otherList = [];
-      if(dataItems != null && dataItems.length > 0) {
-        for (let index = 0; index < dataItems.length; index++) {
-          if(index == 0){
-            firstList.push(dataItems[index]);
-          } else {
-            const element = dataItems[index];
-            otherList.push(element);
-          }       
-        }
-      }
-      console.log("searchList", otherList);
-      console.log("showList", firstList);
-    }
+  // console.log("auth ==>", auth)
+  // service.search.list({
+  //   auth: auth,
+  //   part: 'snippet',
+  //   q: 'dogs',
+  //   type: 'video',
+  //   maxResults: 25
+  // }, (err, results) => {
+  //   console.log("service err  =>>>>", err)
+  //   console.log("results", results)
+  //   if(results != undefined && results.data != undefined) {
+  //     let dataItems = results.data.items;
+  //     let firstList = [];
+  //     let otherList = [];
+  //     if(dataItems != null && dataItems.length > 0) {
+  //       for (let index = 0; index < dataItems.length; index++) {
+  //         if(index == 0){
+  //           firstList.push(dataItems[index]);
+  //         } else {
+  //           const element = dataItems[index];
+  //           otherList.push(element);
+  //         }       
+  //       }
+  //     }
+  //     console.log("searchList", otherList);
+  //     console.log("showList", firstList);
+  //   }
 
-    //res.render('index', { title: 'Express', ErrorDescription: '', searchList: otherList, showList: firstList});
-  });
+  //   //res.render('index', { title: 'Express', ErrorDescription: '', searchList: otherList, showList: firstList});
+  // });
+
+  // videos.list(
+  //   part="snippet,contentDetails,statistics",
+  //   id="t_Lg8HCKq8g"
+  // )
  }
 
 
@@ -167,6 +172,7 @@ function getChannel(auth) {
   service.search.list({
     auth: authGlobal,
     part: 'snippet',
+    hl: "ta",
     q: 'dogs',
     type: 'video',
     maxResults: 25

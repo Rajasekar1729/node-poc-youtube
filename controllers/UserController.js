@@ -262,4 +262,9 @@ userController.load2f2Login = (req, res) => {
   }  
 };
 
+async function checkUniqueUserName() {
+  let userlist = await models.User.findAll({raw: true});
+
+}
+
 module.exports = userController;
