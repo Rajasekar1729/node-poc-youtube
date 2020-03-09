@@ -1,7 +1,7 @@
-let express = require('express');
-let router = express.Router();
-let user = require("../controllers/UserController.js");
-let youtube = require("../controllers/YoutubeController.js");
+const express = require('express');
+const router = express.Router();
+const user = require("../controllers/UserController.js");
+const youtube = require("../controllers/YoutubeController.js");
 
 /* GET home page. */
 router.get('/', function(req, res, next) {

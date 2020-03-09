@@ -1,9 +1,9 @@
 const models = require("../models");
-let fs = require('fs');
-let path = require('path');
-let readline = require('readline');
-let {google} = require('googleapis');
-let OAuth2 = google.auth.OAuth2;
+const fs = require('fs');
+const path = require('path');
+const readline = require('readline');
+const {google} = require('googleapis');
+const OAuth2 = google.auth.OAuth2;
 
 let youtubeController = {};
 let authGlobal;
@@ -11,7 +11,7 @@ let authGlobal;
 // If modifying these scopes, delete your previously saved credentials
 // at ~/.credentials/youtube-nodejs-quickstart.json
 let SCOPES = ['https://www.googleapis.com/auth/youtube.readonly'];
-let TOKEN_DIR = path.join(__dirname, '../.credentials');
+const TOKEN_DIR = path.join(__dirname, '../.credentials');
 let TOKEN_PATH = TOKEN_DIR + '/youtube-nodejs-quickstart.json';
 console.log("TOKEN_PATH", TOKEN_PATH)
 // Load client secrets from a local file.

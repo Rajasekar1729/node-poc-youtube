@@ -262,9 +262,28 @@ userController.load2f2Login = (req, res) => {
   }  
 };
 
-async function checkUniqueUserName() {
-  let userlist = await models.User.findAll({raw: true});
+userController.saveValidation = (req, res) => {
+  let request = req.body;
+  
+};
 
+userController.isCheckUserAcitve = async (userId) => {
+  let users = await models.User.findAll({raw: true, where: {id: userId}});
+  if(users.length > 0 && users[0].isActive == true) {
+      return true;
+  }
+  return false;
+};
+
+async function isValidUsername(username) {
+  let userlist = await models.User.findAll({raw: true});
+  let filterUsername = userlist.filter((user) => {
+    if(user.username.lowercase() == username.lowercase()) {
+      return user;
+    }
+  });
+
+  return (filterUsername.length > 0) ? true : false;
 }
 
 module.exports = userController;

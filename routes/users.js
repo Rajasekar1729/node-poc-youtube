@@ -1,13 +1,21 @@
-var express = require('express');
-var router = express.Router();
-var user = require("../controllers/UserController.js");
+const express = require('express');
+const router = express.Router();
+const user = require("../controllers/UserController.js");
 
 // Authentication and Authorization Middleware
-var auth = (req, res, next) => {
-  if (req.session && req.session.LoggedIn != undefined)
-    return next();
-  else
+const auth = async (req, res, next) => {
+  if (req.session && req.session.LoggedIn != undefined) {
+    const isActiveUser = await user.isCheckUserAcitve(req.session.LoggedIn.id);
+    if(isActiveUser == true){
+      return next();
+    }
+    else {
+      res.redirect("/");
+    }
+  }    
+  else {
     res.redirect("/");
+  }    
 };
 
 // Get all users
@@ -50,7 +58,5 @@ router.get('/logout', (req, res) => {
   console.log("logout called")
   user.logout(req, res);
 });
-
-module.exports = router;
 
 module.exports = router;
