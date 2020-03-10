@@ -98,3 +98,10 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;      
 }
+
+.error-label {
+  color: red;
+  margin-bottom: 10px;
+  font-weight: 600;
+  font-size: 12px;
+}

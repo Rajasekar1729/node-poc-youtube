@@ -66,6 +66,22 @@
     display: none !important;
   }
 
+  .related-video-container {
+    width: 50%;
+    float: left;
+    padding: 0px 10px;    
+  }
+
+  .related-video-content {
+    overflow: auto;
+    max-height: 480px;
+  }
+
+  .play-video-container {
+    width:50%;
+    float: left;
+  }
+
   /* On screens that are less than 700px wide, make the sidebar into a topbar */
   @media screen and (max-width: 700px) {
     .sidebar {

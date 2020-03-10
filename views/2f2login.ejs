@@ -64,7 +64,7 @@
               <span style="color: var(--yt-spec-text-secondary);margin: 0 0 0 2px;">POC</span>
             </div>
             <% if (ErrorDescription != '') { %>
-              <p style="color:red;margin-bottom: 10px;;"><%- ErrorDescription %></p>
+              <p class="error-label"><%- ErrorDescription %></p>
             <% } %>
             <% if (locals != undefined && locals.LoggedIn != undefined) { %>
               <p style="text-align: center;font-weight: 600;margin-bottom: 10px;">Hi <%= locals.LoggedIn.firstname %> <%= locals.LoggedIn.lastname %></p>

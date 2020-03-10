@@ -487,6 +487,20 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
   .display-none {
     display: none !important;
   }
+
+  .error-block {
+    text-align: left !important;
+    padding-left: 5px;
+    font-size: 12px !important;
+    background: #d01a1a;
+  }
+
+  .error-label {
+    color: red;
+    margin-bottom: 10px;
+    font-weight: 600;
+    font-size: 12px;
+  }
   
   .colorlib-bubbles li:nth-child(10) {
     left: 90%;

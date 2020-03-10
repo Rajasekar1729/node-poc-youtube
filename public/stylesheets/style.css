@@ -10,3 +10,10 @@ a {
 .display-flex {
   display: flex;
 }
+
+.error-label {
+  color: red;
+  margin-bottom: 10px;
+  font-weight: 600;
+  font-size: 12px;
+}

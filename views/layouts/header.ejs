@@ -98,14 +98,14 @@
           </div>
     </div>
      -->
-    <div class="form-group" style="float: right;width: 7%;margin: 13px 20px 0px 5px;">
+    <div class="form-group language-select" style="float: right;width: 7%;margin: 13px 20px 0px 5px;">
         <select class="form-control" id="sel1">
           <option>English</option>
           <option>Tamil</option>
           <option>Hindi</option>
         </select>
     </div>
-    <div style="float: right;margin: 19px 0px;font-weight: 600;">Language: </div>
+    <div class="language-select" style="float: right;margin: 19px 0px;font-weight: 600;">Language: </div>
 </div>
 <!-- The sidebar -->
 <div class="sidebar">
@@ -118,10 +118,12 @@
 <script>
   $(function() {
     $('.sidebar a[href^="/' + location.pathname.split("/")[1] + '"]').addClass('active');
-    if(location.pathname.split("/")[1] != "users") {
+    if(location.pathname.split("/")[1] == "home") {
       $('.searchbox-container').removeClass('display-none');
+      $('.language-select').removeClass('display-none');
     } else {
       $('.searchbox-container').addClass('display-none');
+      $('.language-select').addClass('display-none');
     }
   });
 </script>
