@@ -2,23 +2,38 @@
 
 <!-- Page content -->
 <div class="content">
+  <% if (isCardType == true) { %>
+    <div class="article-card-container">
+        <% if (totalList != undefined && totalList.length > 0) { %>
+          <% totalList.forEach(function(list){ %>
+            <article class="article-card" onclick="onPlay()">
+                <div class="hidden-video-tag"><%= list.id.videoId %></div>
+                <img src="<%= list.snippet.thumbnails.medium.url %>" width="<%= list.snippet.thumbnails.medium.width %>"  height="<%= list.snippet.thumbnails.medium.height %>" alt="" class="thumb">              
+                <div>
+                  <p style="font-weight: 600;"><%= list.snippet.title %></p>
+                </div>
+              </article>        
+          <% }) %>
+          <% } %>
+    </div>
+  <% } else { %> 
     <div class="play-video-container">
-        <h3>Play Video</h3>
+        <h4 class="font-weight-600">Play Video</h4>
         <div>      
-            <% if (showList != undefined && showList.length == 1) { %>
-              <iframe width="500" height="315" src="https://www.youtube.com/embed/<%= showList[0].id.videoId %>" frameborder="0" allow="autoplay;encrypted=media" allowfullscreen></iframe>
+            <% if (playList != undefined && playList.length == 1) { %>
+              <iframe width="550" height="350" src="https://www.youtube.com/embed/<%= playList[0].id.videoId %>" frameborder="0" allow="autoplay;encrypted=media" allowfullscreen></iframe>
             <% } %>
         </div>
     </div>        
     <div class="related-video-container">
-      <h3>Related Video List:</h3>
+      <h4 class="font-weight-600">Related Video List:</h4>
       <div class="related-video-content">
-        <% if (searchList != undefined && searchList.length > 0) { %>
-          <% searchList.forEach(function(list){ %>
-            <article>
-              <img src="<%= list.snippet.thumbnails.default.url %>" width="<%= list.snippet.thumbnails.default.width %>"  height="<%= list.snippet.thumbnails.default.height %>" alt="" class="thumb">
-              <h4><%= list.snippet.title %></h4>
+        <% if (relatedList != undefined && relatedList.length > 0) { %>
+          <% relatedList.forEach(function(list){ %>
+            <article class="article-content">
+              <img src="<%= list.snippet.thumbnails.default.url %>" width="<%= list.snippet.thumbnails.default.width %>"  height="<%= list.snippet.thumbnails.default.height %>" alt="" class="thumb article-img">              
               <div>
+                <p style="font-weight: 600;"><%= list.snippet.title %></p>
                 <p><%= list.snippet.description %></p>
               </div>
             </article>
@@ -26,6 +41,37 @@
           <% } %>
         </div>      
     </div>
+  <% }  %> 
 </div>
+<input type="hidden" id="videoTotalList"  value="<%= JSON.stringify(totalList) %>">
+<script>
+    $(document).ready(function () {        
+        $("article").click(function(e){
+          console.log("youtubeId", $(this).find(".hidden-vido-id").text());
+        });         
+    });
+      console.log("videoTotalList", $("#videoTotalList").val());
+      function onPlay() {
+        console.log("youtubeId", $(this).find(".hidden-vido-id").text());
+        // $.ajax({
+        //     url: '/youtube/onPlayHome', // point to server-side controller method
+        //     dataType: 'JSON', // what to expect back from the server
+        //     cache: false,
+        //     contentType: false,
+        //     data: {
+        //       youtubeId: youtubeId,
+        //       videoTotalList: $("#videoTotalList").val()
+        //     },
+        //     processData: false,
+        //     type: 'POST',
+        //     success: function (response) {
+        //       console.log(JSON.stringify(response));               
+        //     },
+        //     error: function (response) {
+        //       console.log(response);
+        //     }
+        // });
+      }
+  </script>
 
 <%- include('../layouts/footer.ejs') %>

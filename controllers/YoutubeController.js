@@ -167,31 +167,60 @@ function getChannel(auth) {
  }
 
 
- youtubeController.get = (req, res) => {
+youtubeController.get = (req, res) => {
   let service = google.youtube('v3');
-  service.search.list({
+  console.log("videos", service)
+  service.videos.list({
     auth: authGlobal,
-    part: 'snippet',
-    hl: "ta",
-    q: 'dogs',
-    type: 'video',
-    maxResults: 25
+    // part: 'snippet',
+    // hl: "ta",
+    // q: 'dogs',
+    // type: 'video',
+    // maxResults: 25,
+    part: "snippet,contentDetails,statistics",
+    chart: "mostPopular"
   }, (err, results) => {
-    let dataItems = results.data.items;
-    let firstList = [];
-    let otherList = [];
-    if(dataItems != null && dataItems.length > 0) {
-      for (let index = 0; index < dataItems.length; index++) {
-        if(index == 0){
-          firstList.push(dataItems[index]);
-        } else {
-          const element = dataItems[index];
-          otherList.push(element);
-        }       
+    console.log("videos results", results)
+    let dataItems = [], firstList = [], otherList = [];
+    if(results != undefined) {
+      dataItems = results.data.items;
+      if(dataItems != null && dataItems.length > 0) {
+        for (let index = 0; index < dataItems.length; index++) {
+          if(index == 0){
+            firstList.push(dataItems[index]);
+          } else {
+            const element = dataItems[index];
+            otherList.push(element);
+          }       
+        }
       }
-    }
-    res.render('./youtube/home', {title: 'Home', ErrorDescription: '', searchList: otherList, showList: firstList});
+      res.render('./youtube/home', {title: 'Home', errorDescription: '', isCardType: ((req.session.LoggedIn["isCardType"] != undefined && req.session.LoggedIn["isCardType"] == false) ? false : true), totalList: dataItems, relatedList: otherList, playList: firstList});
+    }  else {
+      res.render('./youtube/home', {title: 'Home', errorDescription: 'Error On youtube integration.', isCardType: ((req.session.LoggedIn["isCardType"] != undefined && req.session.LoggedIn["isCardType"] == false) ? false : true), totalList: dataItems, relatedList: otherList, playList: firstList});
+    }   
   });
+};
+
+youtubeController.onPlayHome = (req, res) => {
+  let dataItems = [], firstList = [], otherList = [];
+  if(req.body != undefined) {
+    dataItems = req.body;
+    if(dataItems != null && dataItems.length > 0) {
+      otherList = dataItems.filter((data) => {
+        if(data.id["videoId"] != req.body["searchVideo"]) {
+          return data;
+        }
+      });
+      firstList = dataItems.filter((data) => {
+        if(data.id["videoId"] == req.body["searchVideo"]) {
+          return data;
+        }
+      });
+    }
+    res.render('./youtube/home', {title: 'Home', errorDescription: '', isCardType: false, totalList: dataItems, relatedList: otherList, playList: firstList});
+  }  else {
+    res.render('./youtube/home', {title: 'Home', errorDescription: 'Error On youtube integration.', isCardType: false, totalList: dataItems, relatedList: otherList, playList: firstList});
+  }
 };
 
 module.exports = youtubeController;

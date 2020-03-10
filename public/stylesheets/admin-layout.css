@@ -73,8 +73,42 @@
   }
 
   .related-video-content {
+    border: 1px solid #555;
     overflow: auto;
     max-height: 480px;
+  }
+
+
+  .hidden-video-tag {
+    display: none;
+  }
+
+  .article-content {
+    border-bottom: 1px solid #555;
+  }
+
+  .font-weight-600 {
+    font-weight: 600;;
+  }
+
+  .article-img {
+    float: left;
+    margin: 5px;
+  }
+
+  .article-card-container {
+    flex-wrap: wrap;
+    display: flex;
+    flex: inherit;
+    align-items: center;
+    justify-content: space-evenly;
+    margin-top: 10px;
+  }
+
+  .article-card {
+    max-width: 320px;
+    float: left;
+    margin-right: 10px;
   }
 
   .play-video-container {
