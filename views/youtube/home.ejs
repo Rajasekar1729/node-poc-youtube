@@ -2,13 +2,13 @@
 
 <!-- Page content -->
 <div class="content">
-    <!-- <div style="width:300px;">
+    <div style="width:600px;float: left;">
       <% if (showList != undefined && showList.length == 1) { %>
         <iframe width="500" height="315" src="https://www.youtube.com/embed/<%= showList[0].id.videoId %>" frameborder="0" allow="autoplay;encrypted=media" allowfullscreen></iframe>
       <% } %>
     </div>
     
-    <div style="width:300px;">
+    <div style="width:300px;float: left;">
       <% if (searchList != undefined && searchList.length > 0) { %>
         <% searchList.forEach(function(list){ %>
           <article>
@@ -20,7 +20,7 @@
           </article>
         <% }) %>
         <% } %>
-    </div> -->
+    </div>
 </div>
 
 <%- include('../layouts/footer.ejs') %>
