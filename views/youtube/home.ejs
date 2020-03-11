@@ -31,6 +31,7 @@
         <% if (relatedList != undefined && relatedList.length > 0) { %>
           <% relatedList.forEach(function(list){ %>
             <article class="article-content">
+              <div class="hidden-video-tag"><%= list.id.videoId != undefined ? list.id.videoId : list.id %></div>
               <img src="<%= list.snippet.thumbnails.default.url %>" width="<%= list.snippet.thumbnails.default.width %>"  height="<%= list.snippet.thumbnails.default.height %>" alt="" class="thumb article-img">              
               <div>
                 <p style="font-weight: 600;"><%= list.snippet.title %></p>
@@ -47,23 +48,32 @@
 <script>
     $(document).ready(function () {        
         $("article").click(function(e){
-            $.ajax({
+          onPlayArticle($(this).find(".hidden-video-tag").text());
+        }); 
+        
+        function onPlayArticle(videoId) {
+          $.ajax({
               url: '../../youtube/onPlayHome', // point to server-side controller method
-              dataType: 'JSON', // what to expect back from the server
+              dataType: 'html', // what to expect back from the server
               cache: false,
               data: {
-                searchVideo:  $(this).find(".hidden-video-tag").text(),
+                searchVideo: videoId,
                 videoTotalList: $("#videoTotalList").val()
               },
               type: 'POST',
-              success: function (response) {
-                console.log(response)              
+              success: function (response) { 
+                var result = $('<div />').append(response).find('.content').html();
+                $('.content').html(result); 
+                $("article").click(function(e){
+                  console.log(".article click")
+                  onPlayArticle($(this).find(".hidden-video-tag").text());
+                });            
               },
               error: function (response) {
-                console.log(response);
+                console.log("error", $(response)) 
               }
             });
-        });         
+        }
     });
   </script>
 
