@@ -203,19 +203,18 @@ youtubeController.get = (req, res) => {
 
 youtubeController.onPlayHome = (req, res) => {
   let dataItems = [], firstList = [], otherList = [];
-  if(req.body != undefined) {
-    dataItems = req.body;
+  if(req.body != undefined && req.body["videoTotalList"]) {
+    dataItems = JSON.parse(req.body["videoTotalList"]);
     if(dataItems != null && dataItems.length > 0) {
-      otherList = dataItems.filter((data) => {
-        if(data.id["videoId"] != req.body["searchVideo"]) {
-          return data;
-        }
-      });
-      firstList = dataItems.filter((data) => {
-        if(data.id["videoId"] == req.body["searchVideo"]) {
-          return data;
-        }
-      });
+      for (let index = 0; index < dataItems.length; index++) {
+        let videoId = dataItems[index].id["videoId"] != undefined ? dataItems[index].id["videoId"] : dataItems[index].id;
+        if(videoId == req.body["searchVideo"]){
+          firstList.push(dataItems[index]);
+        } else {
+          const element = dataItems[index];
+          otherList.push(element);
+        }       
+      }
     }
     res.render('./youtube/home', {title: 'Home', errorDescription: '', isCardType: false, totalList: dataItems, relatedList: otherList, playList: firstList});
   }  else {
