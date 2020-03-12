@@ -65,6 +65,10 @@
   .display-none {
     display: none !important;
   }
+  
+  .video-description {
+    height: 40px;
+  }
 
   .related-video-container {
     width: 50%;
@@ -85,6 +89,10 @@
 
   .article-content {
     border-bottom: 1px solid #555;
+    height: 100px;
+    overflow: hidden;
+    text-decoration: dotted;
+    text-overflow: ellipsis;
   }
 
   .font-weight-600 {
