@@ -2,7 +2,7 @@
 
 <!-- Page content -->
 <div class="content">
-  <% if (isCardType == true) { %>
+  <% if (isCardType == true && totalList.length > 0) { %>
     <div class="article-card-container">
         <% if (totalList != undefined && totalList.length > 0) { %>
           <% totalList.forEach(function(list){ %>
@@ -15,6 +15,10 @@
               </article>        
           <% }) %>
           <% } %>
+    </div>
+  <% } else if(isCardType == true && errorDescription != '') { %>
+    <div class="no-record-card">
+      <%= errorDescription %>
     </div>
   <% } else { %> 
     <div class="play-video-container">
@@ -35,23 +39,23 @@
           </button>
         </div> -->
     </div>        
-    <div class="related-video-container">
-      <h4 class="font-weight-600">Related Video List:</h4>
-      <div class="related-video-content">
-        <% if (relatedList != undefined && relatedList.length > 0) { %>
-          <% relatedList.forEach(function(list){ %>
-            <article class="article-content">
-              <div class="hidden-video-tag"><%= list.id.videoId != undefined ? list.id.videoId : list.id %></div>
-              <img src="<%= list.snippet.thumbnails.default.url %>" width="<%= list.snippet.thumbnails.default.width %>"  height="<%= list.snippet.thumbnails.default.height %>" alt="" class="thumb article-img">              
-              <div>
-                <p style="font-weight: 600;margin-bottom: 0px;"><%= list.snippet.title %></p>
-                <p class="video-description"><%= list.snippet.description %></p>
-              </div>
-            </article>
-          <% }) %>
-          <% } %>
-        </div>      
-    </div>
+    <% if (relatedList != undefined && relatedList.length > 0) { %>         
+      <div class="related-video-container">
+        <h4 class="font-weight-600">Related Video List:</h4>
+        <div class="related-video-content">        
+            <% relatedList.forEach(function(list){ %>
+              <article class="article-content">
+                <div class="hidden-video-tag"><%= list.id.videoId != undefined ? list.id.videoId : list.id %></div>
+                <img src="<%= list.snippet.thumbnails.default.url %>" width="<%= list.snippet.thumbnails.default.width %>"  height="<%= list.snippet.thumbnails.default.height %>" alt="" class="thumb article-img">              
+                <div>
+                  <p style="font-weight: 600;margin-bottom: 0px;"><%= list.snippet.title %></p>
+                  <p class="video-description"><%= list.snippet.description %></p>
+                </div>
+              </article>
+            <% }) %>          
+          </div>      
+      </div>
+      <% } %>      
   <% }  %> 
   <input type="hidden" id="videoTotalList"  value="<%= JSON.stringify(totalList) %>">
 </div>
@@ -77,12 +81,79 @@
             $('.content').html(result); 
             $("article").click(function(e){
               onPlayArticle($(this).find(".hidden-video-tag").text());
-            });      
+            });  
+            checkFavorite()    
           },
           error: function (response) {
             console.log("error", $(response)) 
           }
         });
+  }
+
+  function copyLinkVideo() {
+    $(".copy-link-tag").removeClass("display-none");
+    $("#txtShareLink").val("https://www.youtube.com/watch?v=" + $("#htxtVideoId").val())
+    var copyText = document.getElementById("txtShareLink");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999)
+    document.execCommand("copy");
+  }
+
+  function addToFavorite() {
+    $.ajax({
+      url: '../../youtube/addToFavorite', // point to server-side controller method
+      dataType: 'JSON', // what to expect back from the server
+      cache: false,
+      data: {
+        id:  $("#htxtVideoId").val()
+      },
+      type: 'POST',
+      success: function (response) { 
+        $('#btnRemoveFavourite').removeClass('display-none'); 
+        $('#btnAddFavourite').addClass('display-none'); 
+      },
+      error: function (response) {
+        console.log("error", $(response)) 
+      }
+    });
+  }
+  function removeToFavorite() {
+    $.ajax({
+      url: '../../youtube/removeToFavorite', // point to server-side controller method
+      dataType: 'JSON', // what to expect back from the server
+      cache: false,
+      data: {
+        id:  $("#htxtVideoId").val()
+      },
+      type: 'POST',
+      success: function (response) { 
+        $('#btnRemoveFavourite').addClass('display-none'); 
+        $('#btnAddFavourite').removeClass('display-none'); 
+      },
+      error: function (response) {
+        console.log("error", $(response)) 
+      }
+    });
+  }
+
+  function checkFavorite() {
+    $.ajax({
+      url: '../../youtube/checkFavorite/' + $("#htxtVideoId").val(), // point to server-side controller method
+      dataType: 'JSON', // what to expect back from the server
+      cache: false,
+      type: 'get',
+      success: function (response) { 
+        if(response.isAdded == true) {
+          $('#btnRemoveFavourite').removeClass('display-none'); 
+        } else {
+          $('#btnAddFavourite').removeClass('display-none'); 
+        }
+        
+      },
+      error: function (response) {
+        console.log("error", $(response)) 
+      }
+    });
   }
 </script>
 <%- include('../layouts/footer.ejs') %>

@@ -37,8 +37,12 @@ router.get('/forget-password', function(req, res) {
 });
 
 router.get('/reset-password/:id', function(req, res) {
-	res.render('reset-password', {title: 'Reset Password', ErrorDescription: ''})
+	user.loadResetPassword(req, res);
 });
+
+router.post('/validateOTPResetPaasword', (req,res) => {
+	user.validateOTPResetPaasword(req, res);
+  });
 
 router.post('/forgetPassword', (req,res) => {
 	user.forgetPassword(req, res);
@@ -50,6 +54,10 @@ router.get('/2f2-login/:id', function(req, res) {
 
 router.post('/validation2f2Login', function(req, res) {
 	user.login2f2Validation(req, res);
+})
+
+router.post('/resetPassword', function(req, res) {
+	user.resetPassword(req, res);
 })
 
 router.get('/home', auth, function(req, res) {

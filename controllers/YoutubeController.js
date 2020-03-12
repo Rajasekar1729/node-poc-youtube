@@ -129,9 +129,9 @@ youtubeController.getHome = (req, res) => {
           }       
         }
       }
-      res.render('./youtube/home', {title: 'Home', errorDescription: '', isCardType: ((req.session.LoggedIn["isCardType"] != undefined && req.session.LoggedIn["isCardType"] == false) ? false : true), totalList: dataItems, relatedList: otherList, playList: firstList});
+      res.render('./youtube/home', {title: 'Home', errorDescription: '', isCardType: true, totalList: dataItems, relatedList: otherList, playList: firstList});
     }  else {
-      res.render('./youtube/home', {title: 'Home', errorDescription: 'Error On youtube integration.', isCardType: ((req.session.LoggedIn["isCardType"] != undefined && req.session.LoggedIn["isCardType"] == false) ? false : true), totalList: dataItems, relatedList: otherList, playList: firstList});
+      res.render('./youtube/home', {title: 'Home', errorDescription: 'No Record to show.', isCardType: true, totalList: dataItems, relatedList: otherList, playList: firstList});
     }   
   });
 };
@@ -140,7 +140,7 @@ youtubeController.getFavorites = (req, res) => {
   let service = google.youtube('v3');
 
   models.YoutubeFavorite.findAll({raw: true, where: {user_id: req.session.LoggedIn.id}}).then(function(youtubeFavorites) {
-    if(youtubeFavorites.length > 0){
+    if(youtubeFavorites != undefined && youtubeFavorites.length > 0){
 
       let videoIds = [];
 
@@ -166,13 +166,13 @@ youtubeController.getFavorites = (req, res) => {
               }       
             }
           }
-          res.render('./youtube/favorites', {title: 'Favorites', errorDescription: '', isCardType: ((req.session.LoggedIn["isCardType"] != undefined && req.session.LoggedIn["isCardType"] == false) ? false : true), totalList: dataItems, relatedList: otherList, playList: firstList});
+          res.render('./youtube/favorites', {title: 'Favorites', errorDescription: '', isCardType: true, totalList: dataItems, relatedList: otherList, playList: firstList});
         }  else {
-          res.render('./youtube/favorites', {title: 'Favorites', errorDescription: 'Error On youtube integration.', isCardType: ((req.session.LoggedIn["isCardType"] != undefined && req.session.LoggedIn["isCardType"] == false) ? false : true), totalList: dataItems, relatedList: otherList, playList: firstList});
+          res.render('./youtube/favorites', {title: 'Favorites', errorDescription: 'Error On youtube integration.', isCardType: true, totalList: dataItems, relatedList: otherList, playList: firstList});
         }   
       });
     } else {
-      res.render('./youtube/favorites', {title: 'Favorites', errorDescription: 'No Favorites.', isCardType: ((req.session.LoggedIn["isCardType"] != undefined && req.session.LoggedIn["isCardType"] == false) ? false : true), totalList: dataItems, relatedList: otherList, playList: firstList});
+      res.render('./youtube/favorites', {title: 'Favorites', errorDescription: 'No Favorites to show.', isCardType: true, totalList: [], relatedList: [], playList: []});
     }    
   });
 };

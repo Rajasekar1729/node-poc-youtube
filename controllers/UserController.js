@@ -8,7 +8,6 @@ userController.list = (req, res) => {
   const user = models.User.findAll({
     raw: true
   }).then(function(users) { 
-    console.log("users", users)
     let filterUser = users.filter((user) => {
       if(user.isSuperUser == false) {
         user["isActive"] = user["isActive"] == true ? "Yes" : "No";
@@ -75,12 +74,10 @@ userController.save = (req, res) => {
   request["isSuperUser"] = false;
   models.User.create(request).then(function(userEntity) {
     const dataObj = userEntity.get({plain:true});
-    console.log("dataObj",dataObj)
     if(dataObj != undefined && dataObj.length == 0) {
       console.log(err);
       res.render("../views/createAccount");
     } else {
-      console.log("Successfully created an user.");
       req.session.LoggedIn = dataObj;
       res.redirect("/home");
     }
@@ -185,20 +182,30 @@ function generateOTP(user,res, page) {
   if(page == "index") {
     content = "<div><p>Hi " + user.firstname + " " + user.lastname +",</p><p><b>" + OTP + "</b> is the One Time Pasword(OTP) for your login. Valid only for this login.</p><p><a href='http://localhost:3000/2f2-login/"+ newUuid +"'>Click here to login</a></p><div>"
   } else if(page == "forget") {
-    content = "<div><p>Hi " + user.firstname + " " + user.lastname +",</p><p><b>" + OTP + "</b> is the One Time Pasword(OTP) for your reset password. Valid only for this reset Password.</p><p><a href='http://localhost:3000/reset-password/"+ newUuid +"'>Click here to reset Password</a></p><div>"
+    content = "<div><p>Hi " + user.firstname + " " + user.lastname +",</p><p><b>" + OTP + "</b> is the One Time Pasword(OTP) for your reset password. Valid only for this Reset Password.</p><p><a href='http://localhost:3000/reset-password/"+ newUuid +"'>Click here to Reset Password</a></p><div>"
   }
 
-  let request = {
-    uuid: newUuid,
-    user_id: user.id,
-    otp: OTP
+  if(page == "index"){
+    let request = {
+      uuid: newUuid,
+      user_id: user.id,
+      otp: OTP
+    }
+    models.OTPEntries.create(request).then(function(otpEntryEntity) {
+      const dataObj = otpEntryEntity.get({plain:true})
+      sendMail(user.email, subject, content, newUuid,res, page);
+    });
+  } else if(page == "forget") {
+    let request = {
+      uniqueId: newUuid,
+      user_id: user.id,
+      otp: OTP
+    }
+    models.OTPResetPassword.create(request).then(function(otpResetEntity) {
+      const dataObj = otpResetEntity.get({plain:true})
+      sendMail(user.email, subject, content, newUuid,res, page);
+    });
   }
-
-  models.OTPEntries.create(request).then(function(otpEntryEntity) {
-    const dataObj = otpEntryEntity.get({plain:true})
-    console.log("otpEntry", dataObj);
-    sendMail(user.email, subject, content, newUuid,res, page);
-  });
 }
 
 // login 2f2 validation
@@ -278,7 +285,6 @@ userController.load2f2Login = (req, res) => {
 };
 
 userController.usernameValidation = async (req, res) => {
-  console.log("usernameValidation",req.params.id)
   const isValid = await isValidUsername(req.params.id);
   if(isValid == true) {
     res.send({ isError: false , errorDescription: '' });
@@ -315,5 +321,94 @@ userController.forgetPassword = async (req, res) => {
     res.render('forget-password', { title: 'Forget Password', IsError: true, ErrorDescription: "Unable to Reset Password Please vaild E-mail."});
   }
 };
+
+// Show list of users
+userController.loadResetPassword = (req, res) => {
+  try {  
+    models.OTPResetPassword.findAll({
+      raw: true,
+      where: {
+        uniqueId: req.params.id
+      }
+    }).then(function(dataObj) {               
+      if(dataObj.length > 0) {        
+        models.OTPResetPassword.findAll({
+          raw: true,
+          where: {
+            user_id: dataObj[0].user_id
+          },
+          order: [
+            ['createdAt', 'DESC']
+        ],
+        }).then(function(listById) {
+          if(listById.length > 0 && listById[0].uniqueId == req.params.id) {
+            const user = models.User.findAll({
+              raw: true,
+              where: {
+                id: dataObj[0].user_id
+              }
+            }).then(function(users) {            
+              if(users.length > 0) {                  
+                if(users[0].isActive == true) {
+                  req.session.LoggedIn = users[0];
+                  res.render('reset-password', { title: 'Reset Password', IsOTPValidated: false, ErrorDescription: ''})          
+                } else {
+                  res.render('reset-password', { title: 'Reset Password', IsOTPValidated: false, ErrorDescription: 'OTP is Expired'});
+                }        
+              } else {        
+                res.render('reset-password', { title: 'Reset Password', IsOTPValidated: false, ErrorDescription: 'OTP is Expired'});
+              }
+            });   
+            
+          } else {
+            res.render('reset-password', { title: 'Reset Password', IsOTPValidated: false, ErrorDescription: 'OTP is Expired'})
+          }
+        })             
+      } else {        
+        res.render('reset-password', { title: 'Reset Password', IsOTPValidated: false, ErrorDescription: "Please enter valid OTP."});
+      }
+    });    
+  } catch (error) {    
+    res.render('reset-password', { title: 'Reset Password', IsOTPValidated: false, ErrorDescription: error.message });
+  }  
+};
+
+//  OTP Reset validation
+userController.validateOTPResetPaasword = (req, res) => {
+  try {  
+    const user = models.OTPResetPassword.findAll({
+      raw: true,
+      where: {
+        otp: req.body.otpPassword
+      }
+    }).then(function(dataObj) {            
+      if(dataObj.length > 0) {
+        res.render('reset-password', { title: 'Reset Password', IsOTPValidated: true,  ErrorDescription: ""});               
+      } else {       
+        res.render('reset-password', { title: 'Reset Password', IsOTPValidated: false,  ErrorDescription: "Please enter valid OTP."});
+      }
+    });    
+  } catch (error) {    
+    res.render('reset-password', { title: 'Reset Password', IsOTPValidated: false,  ErrorDescription: error.message });
+  }  
+};
+
+// Update an user
+userController.resetPassword = (req, res) => {
+  models.User.update({ password: req.body.password }, { raw: true,
+    where: {
+      id: req.session.LoggedIn.id
+    }
+  }).then(function(user) {
+    if (user != undefined && user.length == 0) {
+      console.log(err);
+      res.render('reset-password', { title: 'Reset Password', IsOTPValidated: true, ErrorDescription: "Please try again later"});
+    } else {
+      res.redirect("/home");
+    }    
+  });
+};
+
+
 
 module.exports = userController;

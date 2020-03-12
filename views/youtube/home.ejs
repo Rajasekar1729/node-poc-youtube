@@ -2,7 +2,7 @@
 
 <!-- Page content -->
 <div class="content">
-  <% if (isCardType == true) { %>
+  <% if (isCardType == true && totalList.length > 0) { %>
     <div class="article-card-container">
         <% if (totalList != undefined && totalList.length > 0) { %>
           <% totalList.forEach(function(list){ %>
@@ -16,6 +16,10 @@
           <% }) %>
           <% } %>
     </div>
+<% } else if(isCardType == true && errorDescription != '') { %>
+      <div class="no-record-card">
+        <%= errorDescription %>
+      </div>
   <% } else { %> 
     <div class="play-video-container">
         <h4 class="font-weight-600">Play Video</h4>
@@ -29,16 +33,20 @@
           <button id="btnAddFavourite" class="btn btn-success display-none" onclick="addToFavorite()">Add to Favorite</button>
           <button id="btnRemoveFavourite" class="btn btn-danger display-none" onclick="removeToFavorite()">Remove Favorite</button>
         </div>
-        <!-- <div style="float: right;margin-right: 17px;">
+        <div style="float: right;margin-right: 17px;">
           <button class="btn btn-link" onclick="copyLinkVideo()">
             Copy Link
           </button>
-        </div> -->
-    </div>        
+        </div>
+        <div class="form-group copy-link-tag display-none">
+          <label for="txtShareLink">Share the youtube link:</label>
+          <textarea readonly class="form-control" id="txtShareLink" rows="2"></textarea>
+        </div>
+    </div>   
+    <% if (relatedList != undefined && relatedList.length > 0) { %>         
     <div class="related-video-container">
       <h4 class="font-weight-600">Related Video List:</h4>
-      <div class="related-video-content">
-        <% if (relatedList != undefined && relatedList.length > 0) { %>
+      <div class="related-video-content">        
           <% relatedList.forEach(function(list){ %>
             <article class="article-content">
               <div class="hidden-video-tag"><%= list.id.videoId != undefined ? list.id.videoId : list.id %></div>
@@ -48,10 +56,10 @@
                 <p class="video-description"><%= list.snippet.description %></p>
               </div>
             </article>
-          <% }) %>
-          <% } %>
+          <% }) %>          
         </div>      
     </div>
+    <% } %>
   <% }  %> 
   <input type="hidden" id="videoTotalList"  value="<%= JSON.stringify(totalList) %>">
 </div>
@@ -106,7 +114,8 @@
   }
 
   function onSearchTxt() {
-    $.ajax({
+    if($("#txtSearch").val() != '') {
+      $.ajax({
       url: '../../youtube/getSearch/' + $("#txtSearch").val(), // point to server-side controller method
       dataType: 'html', // what to expect back from the server
       cache: false,
@@ -122,10 +131,13 @@
         console.log("error", $(response)) 
       }
     });
+    }
   }
 
   function copyLinkVideo() {
-    var copyText = document.getElementById("htxtVideoId");
+    $(".copy-link-tag").removeClass("display-none");
+    $("#txtShareLink").val("https://www.youtube.com/watch?v=" + $("#htxtVideoId").val())
+    var copyText = document.getElementById("txtShareLink");
     copyText.select();
     copyText.setSelectionRange(0, 99999)
     document.execCommand("copy");

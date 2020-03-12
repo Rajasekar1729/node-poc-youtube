@@ -70,6 +70,14 @@
     height: 40px;
   }
 
+  .no-record-card {
+    padding: 2%;
+    border: 1px solid #555;
+    margin: 5%;
+    text-align: center;
+    font-weight: 600;
+  }
+
   .related-video-container {
     width: 50%;
     float: left;
@@ -95,6 +103,18 @@
     text-overflow: ellipsis;
   }
 
+  
+  .article-content:hover {    
+    background-color: #4CAF50;
+    color: white;
+  }
+
+  .copy-link-tag {
+    width: 100%;
+    display: inline-block;
+    margin-top: 10px;
+  }
+
   .font-weight-600 {
     font-weight: 600;;
   }
@@ -114,9 +134,20 @@
   }
 
   .article-card {
+    border: 1px solid #555;
+    margin-bottom: 10px;
     max-width: 320px;
     float: left;
     margin-right: 10px;
+  }
+
+  .article-card:hover {    
+    background-color: #4CAF50;
+    color: white;
+  }
+
+  .article-card:hover img {
+    opacity: .5;
   }
 
   article:hover {
