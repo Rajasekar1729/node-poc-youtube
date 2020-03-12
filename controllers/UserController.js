@@ -34,7 +34,7 @@ userController.loginValidation = (req, res) => {
         if(users[0].isSuperUser == true) {
           res.redirect('/home');
         } else if(users[0].isActive == true) {
-          generateOTP(users[0],res);          
+          generateOTP(users[0],res, "index");          
         } else {
           res.render('index', { title: 'Login', IsError: true, ErrorDescription: "Unable to login Please contact adminstrator."});
         }        
@@ -128,7 +128,7 @@ userController.delete = (req, res) => {
   })
 };
 
-function sendMail(toMailId, subject, html, newUuid, res) {
+function sendMail(toMailId, subject, html, newUuid, res, page) {
   var transporterPayer = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 587,
@@ -152,16 +152,24 @@ function sendMail(toMailId, subject, html, newUuid, res) {
   };
   transporterPayer.sendMail(mailOptions, function(error, info) {
     if (error) {
-    res.render('index', { title: 'Login',IsError: true, ErrorDescription: error.message });
-    } else {
-    console.log("Email sent: " + info.response);
-    res.redirect('/2f2-login/' + newUuid);
+      if(page == "index") {
+        res.render('index', { title: 'Login',IsError: true, ErrorDescription: error.message });
+      } else if(page == "forget") {
+        res.render('forget-password', { title: 'Forget Password', IsError: true, ErrorDescription: error.message });
+      }
+    
+    } else {  
+        if(page == "index") {
+          res.redirect('/2f2-login/' + newUuid);
+        } else if(page == "forget") {
+          res.redirect('/reset-password/' + newUuid);
+        }
     }
   });
 }
 
 // Function to generate OTP 
-function generateOTP(user,res) { 
+function generateOTP(user,res, page) { 
   let string = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'; 
   let OTP = ''; 
   let len = string.length;
@@ -172,7 +180,13 @@ function generateOTP(user,res) {
   let newUuid = uuidv4();
   
   let subject = "OTP";
-  let content = "<div><p>Hi " + user.firstname + " " + user.lastname +",</p><p><b>" + OTP + "</b> is the One Time Pasword(OTP) for your login. Valid only for this login</p><p><a href='http://localhost:3000/2f2-login/"+ newUuid +"'>Click here to login</a></p><div>"
+  let content = "Test Mail";
+
+  if(page == "index") {
+    content = "<div><p>Hi " + user.firstname + " " + user.lastname +",</p><p><b>" + OTP + "</b> is the One Time Pasword(OTP) for your login. Valid only for this login.</p><p><a href='http://localhost:3000/2f2-login/"+ newUuid +"'>Click here to login</a></p><div>"
+  } else if(page == "forget") {
+    content = "<div><p>Hi " + user.firstname + " " + user.lastname +",</p><p><b>" + OTP + "</b> is the One Time Pasword(OTP) for your reset password. Valid only for this reset Password.</p><p><a href='http://localhost:3000/reset-password/"+ newUuid +"'>Click here to reset Password</a></p><div>"
+  }
 
   let request = {
     uuid: newUuid,
@@ -183,7 +197,7 @@ function generateOTP(user,res) {
   models.OTPEntries.create(request).then(function(otpEntryEntity) {
     const dataObj = otpEntryEntity.get({plain:true})
     console.log("otpEntry", dataObj);
-    sendMail(user.email, subject, content, newUuid,res);
+    sendMail(user.email, subject, content, newUuid,res, page);
   });
 }
 
@@ -292,5 +306,14 @@ async function isValidUsername(username) {
 
   return (filterUsername.length > 0) ? false : true;
 }
+
+userController.forgetPassword = async (req, res) => {
+  let users = await models.User.findAll({raw: true, where: { email: req.body.email }});
+  if(users.length > 0) {
+    generateOTP(users[0],res, "forget"); 
+  } else {
+    res.render('forget-password', { title: 'Forget Password', IsError: true, ErrorDescription: "Unable to Reset Password Please vaild E-mail."});
+  }
+};
 
 module.exports = userController;

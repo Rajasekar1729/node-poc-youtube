@@ -30,7 +30,19 @@ router.post('/login', (req,res) => {
 
 router.get('/create-account', function(req, res) {
 	res.render('create-account', {title: 'Create Account', ErrorDescription: ''})
-})
+});
+
+router.get('/forget-password', function(req, res) {
+	res.render('forget-password', {title: 'Forget Password', ErrorDescription: ''})
+});
+
+router.get('/reset-password/:id', function(req, res) {
+	res.render('reset-password', {title: 'Reset Password', ErrorDescription: ''})
+});
+
+router.post('/forgetPassword', (req,res) => {
+	user.forgetPassword(req, res);
+});
 
 router.get('/2f2-login/:id', function(req, res) {
 	user.load2f2Login(req, res)
