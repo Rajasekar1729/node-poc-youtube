@@ -34,7 +34,6 @@ router.get('/create-account', function(req, res) {
 
 router.get('/2f2-login/:id', function(req, res) {
 	user.load2f2Login(req, res)
-	//res.render('2f2login', {title: '2F2 Login', ErrorDescription: ''})
 })
 
 router.post('/validation2f2Login', function(req, res) {
@@ -42,12 +41,11 @@ router.post('/validation2f2Login', function(req, res) {
 })
 
 router.get('/home', auth, function(req, res) {
-	youtube.get(req, res);
-	//res.render('./youtube/home', {title: 'Home'})
+	youtube.getHome(req, res);
 })
 
 router.get('/favorites', auth, function(req, res) {
-	res.render('./youtube/favorites', {title: 'Favorites'})
+	youtube.getFavorites(req, res);
 })
 
 module.exports = router;

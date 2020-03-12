@@ -13,7 +13,6 @@ let authGlobal;
 let SCOPES = ['https://www.googleapis.com/auth/youtube.readonly'];
 const TOKEN_DIR = path.join(__dirname, '../.credentials');
 let TOKEN_PATH = TOKEN_DIR + '/youtube-nodejs-quickstart.json';
-console.log("TOKEN_PATH", TOKEN_PATH)
 // Load client secrets from a local file.
 fs.readFile('youtube-client-secret.json', function processClientSecrets(err, content) {
   if (err) {
@@ -107,80 +106,16 @@ function storeToken(token) {
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
 function getChannel(auth) {
-  //let service = google.youtube('v3');
-  // service.channels.list({
-  //   auth: auth,
-  //   part: 'snippet,contentDetails,statistics',
-  //   forUsername: 'GoogleDevelopers'
-  // }, function(err, response) {
-  //   if (err) {
-  //     console.log('The API returned an error: ' + err);
-  //     return;
-  //   }
-  //   let channels = response.data.items;
-  //   if (channels.length == 0) {
-  //     console.log('No channel found.');
-  //   } else {
-  //     console.log('This channel\'s ID is %s. Its title is \'%s\', and ' +
-  //                 'it has %s views.',
-  //                 channels[0].id,
-  //                 channels[0].snippet.title,
-  //                 channels[0].statistics.viewCount);
-         
-  //   }
-  // });
-  // console.log("auth ==>", auth)
-  // service.search.list({
-  //   auth: auth,
-  //   part: 'snippet',
-  //   q: 'dogs',
-  //   type: 'video',
-  //   maxResults: 25
-  // }, (err, results) => {
-  //   console.log("service err  =>>>>", err)
-  //   console.log("results", results)
-  //   if(results != undefined && results.data != undefined) {
-  //     let dataItems = results.data.items;
-  //     let firstList = [];
-  //     let otherList = [];
-  //     if(dataItems != null && dataItems.length > 0) {
-  //       for (let index = 0; index < dataItems.length; index++) {
-  //         if(index == 0){
-  //           firstList.push(dataItems[index]);
-  //         } else {
-  //           const element = dataItems[index];
-  //           otherList.push(element);
-  //         }       
-  //       }
-  //     }
-  //     console.log("searchList", otherList);
-  //     console.log("showList", firstList);
-  //   }
+}
 
-  //   //res.render('index', { title: 'Express', ErrorDescription: '', searchList: otherList, showList: firstList});
-  // });
-
-  // videos.list(
-  //   part="snippet,contentDetails,statistics",
-  //   id="t_Lg8HCKq8g"
-  // )
- }
-
-
-youtubeController.get = (req, res) => {
+youtubeController.getHome = (req, res) => {
   let service = google.youtube('v3');
-  console.log("videos", service)
   service.videos.list({
     auth: authGlobal,
-    // part: 'snippet',
-    // hl: "ta",
-    // q: 'dogs',
-    // type: 'video',
-    // maxResults: 25,
     part: "snippet,contentDetails,statistics",
-    chart: "mostPopular"
+    chart: "mostPopular",
+    regionCode: "US"
   }, (err, results) => {
-    console.log("videos results", results)
     let dataItems = [], firstList = [], otherList = [];
     if(results != undefined) {
       dataItems = results.data.items;
@@ -198,6 +133,47 @@ youtubeController.get = (req, res) => {
     }  else {
       res.render('./youtube/home', {title: 'Home', errorDescription: 'Error On youtube integration.', isCardType: ((req.session.LoggedIn["isCardType"] != undefined && req.session.LoggedIn["isCardType"] == false) ? false : true), totalList: dataItems, relatedList: otherList, playList: firstList});
     }   
+  });
+};
+
+youtubeController.getFavorites = (req, res) => {
+  let service = google.youtube('v3');
+
+  models.YoutubeFavorite.findAll({raw: true, where: {user_id: req.session.LoggedIn.id}}).then(function(youtubeFavorites) {
+    if(youtubeFavorites.length > 0){
+
+      let videoIds = [];
+
+      for(let i =0; i < youtubeFavorites.length; i++) {
+        videoIds.push(youtubeFavorites[i].videoId);
+      }
+
+      service.videos.list({
+        auth: authGlobal,
+        part: "snippet,contentDetails,statistics",
+        id: videoIds.join(",")
+      }, (err, results) => {
+        let dataItems = [], firstList = [], otherList = [];
+        if(results != undefined) {
+          dataItems = results.data.items;
+          if(dataItems != null && dataItems.length > 0) {
+            for (let index = 0; index < dataItems.length; index++) {
+              if(index == 0){
+                firstList.push(dataItems[index]);
+              } else {
+                const element = dataItems[index];
+                otherList.push(element);
+              }       
+            }
+          }
+          res.render('./youtube/favorites', {title: 'Favorites', errorDescription: '', isCardType: ((req.session.LoggedIn["isCardType"] != undefined && req.session.LoggedIn["isCardType"] == false) ? false : true), totalList: dataItems, relatedList: otherList, playList: firstList});
+        }  else {
+          res.render('./youtube/favorites', {title: 'Favorites', errorDescription: 'Error On youtube integration.', isCardType: ((req.session.LoggedIn["isCardType"] != undefined && req.session.LoggedIn["isCardType"] == false) ? false : true), totalList: dataItems, relatedList: otherList, playList: firstList});
+        }   
+      });
+    } else {
+      res.render('./youtube/favorites', {title: 'Favorites', errorDescription: 'No Favorites.', isCardType: ((req.session.LoggedIn["isCardType"] != undefined && req.session.LoggedIn["isCardType"] == false) ? false : true), totalList: dataItems, relatedList: otherList, playList: firstList});
+    }    
   });
 };
 
@@ -222,12 +198,12 @@ youtubeController.onPlayHome = (req, res) => {
   }
 };
 
-youtubeController.getSerachVideo = (req, res) => {
+youtubeController.getSearchVideo = (req, res) => {
   let service = google.youtube('v3');
   service.search.list({
     auth: authGlobal,
     part: 'snippet',    
-    q: req.params.serachText,
+    q: req.params.id,
     type: 'video',
     maxResults: 25,
   }, (err, results) => {
@@ -253,12 +229,11 @@ youtubeController.getSerachVideo = (req, res) => {
 
 youtubeController.getLangugeVideo = (req, res) => {
   let service = google.youtube('v3');
-  service.search.list({
+  service.videos.list({
     auth: authGlobal,
     part: 'snippet',    
-    q: req.params.serachText,
-    type: 'video',
-    maxResults: 25,
+    hl: req.params.id,
+    regionCode: req.params.id == "ta" ? "IN" : "US"
   }, (err, results) => {
     let dataItems = [], firstList = [], otherList = [];
     if(results != undefined) {
@@ -272,11 +247,43 @@ youtubeController.getLangugeVideo = (req, res) => {
             otherList.push(element);
           }       
         }
-      }
+      }      
       res.render('./youtube/home', {title: 'Home', errorDescription: '', isCardType: ((req.session.LoggedIn["isCardType"] != undefined && req.session.LoggedIn["isCardType"] == false) ? false : true), totalList: dataItems, relatedList: otherList, playList: firstList});
     }  else {
       res.render('./youtube/home', {title: 'Home', errorDescription: 'Error On youtube integration.', isCardType: ((req.session.LoggedIn["isCardType"] != undefined && req.session.LoggedIn["isCardType"] == false) ? false : true), totalList: dataItems, relatedList: otherList, playList: firstList});
     }   
+  });
+};
+
+youtubeController.addToFavorite = (req, res) => {
+  let request = {
+    user_id: req.session.LoggedIn.id,
+    videoId: req.body.id
+  }
+  models.YoutubeFavorite.create(request).then(function(youtubeFavoriteEntity) {
+    const dataObj = youtubeFavoriteEntity.get({plain:true})
+    console.log("YoutubeFavorite", dataObj);
+    res.send({ isError:  false})
+  });
+};
+
+youtubeController.removeToFavorite = (req, res) => {
+  models.YoutubeFavorite.destroy({
+    where: {
+      videoId: req.body.id
+    }
+  }).then(function(youtubeFavoriteEntity) {
+    res.send({ isError:  false})
+  });
+};
+
+youtubeController.checkFavorite = (req, res) => {
+  models.YoutubeFavorite.findAll({raw: true, where: {videoId: req.params.id}}).then(function(youtubeFavorites) {
+    if(youtubeFavorites.length > 0){
+      res.send({ isAdded: true})
+    } else {
+      res.send({ isAdded: false})
+    }    
   });
 };
 

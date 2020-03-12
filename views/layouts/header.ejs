@@ -70,9 +70,9 @@
   </div></a>
   <div class="searchbox-container">
     <div class="input-group">
-      <input type="text" class="form-control" placeholder="Search">
+      <input type="text" id="txtSearch" class="form-control" placeholder="Search">
       <div class="input-group-btn">
-        <button class="btn btn-default" type="submit">
+        <button id="btnSearch" class="btn btn-default" type="button" onclick="onSearchTxt()">
           <i class="glyphicon glyphicon-search"></i>
         </button>
       </div>
@@ -99,10 +99,10 @@
     </div>
      -->
     <div class="form-group language-select" style="float: right;width: 7%;margin: 13px 20px 0px 5px;">
-        <select class="form-control" id="sel1">
-          <option>English</option>
-          <option>Tamil</option>
-          <option>Hindi</option>
+        <select class="form-control" id="drpLanguage" onchange="onChangeDrpLanguage()">
+          <option value="en">English</option>
+          <option value="ta">Tamil</option>
+          <option value="hi">Hindi</option>
         </select>
     </div>
     <div class="language-select" style="float: right;margin: 19px 0px;font-weight: 600;">Language: </div>

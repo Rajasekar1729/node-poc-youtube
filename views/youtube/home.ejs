@@ -21,9 +21,19 @@
         <h4 class="font-weight-600">Play Video</h4>
         <div>      
             <% if (playList != undefined && playList.length == 1) { %>
+              <input type="text" style="display: none;" id="htxtVideoId"  value="<%=  playList[0].id.videoId != undefined ? playList[0].id.videoId : playList[0].id %>">
               <iframe width="550" height="350" src="https://www.youtube.com/embed/<%= playList[0].id.videoId != undefined ? playList[0].id.videoId : playList[0].id %>" frameborder="0" allow="autoplay;encrypted=media" allowfullscreen></iframe>
             <% } %>
         </div>
+        <div style="float: left;">
+          <button id="btnAddFavourite" class="btn btn-success display-none" onclick="addToFavorite()">Add to Favorite</button>
+          <button id="btnRemoveFavourite" class="btn btn-danger display-none" onclick="removeToFavorite()">Remove Favorite</button>
+        </div>
+        <!-- <div style="float: right;margin-right: 17px;">
+          <button class="btn btn-link" onclick="copyLinkVideo()">
+            Copy Link
+          </button>
+        </div> -->
     </div>        
     <div class="related-video-container">
       <h4 class="font-weight-600">Related Video List:</h4>
@@ -43,38 +53,139 @@
         </div>      
     </div>
   <% }  %> 
+  <input type="hidden" id="videoTotalList"  value="<%= JSON.stringify(totalList) %>">
 </div>
-<input type="hidden" id="videoTotalList"  value="<%= JSON.stringify(totalList) %>">
 <script>
-    $(document).ready(function () {        
+  $(document).ready(function () {        
+      $("article").click(function(e){
+        onPlayArticle($(this).find(".hidden-video-tag").text());
+      });           
+  });
+
+  function onPlayArticle(videoId) {
+      $.ajax({
+          url: '../../youtube/playHome', // point to server-side controller method
+          dataType: 'html', // what to expect back from the server
+          cache: false,
+          data: {
+            searchVideo: videoId,
+            videoTotalList: $("#videoTotalList").val()
+          },
+          type: 'POST',
+          success: function (response) { 
+            var result = $('<div />').append(response).find('.content').html();
+            $('.content').html(result); 
+            $("article").click(function(e){
+              onPlayArticle($(this).find(".hidden-video-tag").text());
+            });      
+            checkFavorite();
+          },
+          error: function (response) {
+            console.log("error", $(response)) 
+          }
+        });
+  }
+
+  function onChangeDrpLanguage() {
+    $.ajax({
+      url: '../../youtube/getLanguage/' + $("#drpLanguage").val(), // point to server-side controller method
+      dataType: 'html', // what to expect back from the server
+      cache: false,
+      type: 'GET',
+      success: function (response) { 
+        var result = $('<div />').append(response).find('.content').html();
+        $('.content').html(result); 
         $("article").click(function(e){
           onPlayArticle($(this).find(".hidden-video-tag").text());
-        }); 
-        
-        function onPlayArticle(videoId) {
-          $.ajax({
-              url: '../../youtube/onPlayHome', // point to server-side controller method
-              dataType: 'html', // what to expect back from the server
-              cache: false,
-              data: {
-                searchVideo: videoId,
-                videoTotalList: $("#videoTotalList").val()
-              },
-              type: 'POST',
-              success: function (response) { 
-                var result = $('<div />').append(response).find('.content').html();
-                $('.content').html(result); 
-                $("article").click(function(e){
-                  console.log(".article click")
-                  onPlayArticle($(this).find(".hidden-video-tag").text());
-                });            
-              },
-              error: function (response) {
-                console.log("error", $(response)) 
-              }
-            });
-        }
+        });            
+      },
+      error: function (response) {
+        console.log("error", $(response)) 
+      }
     });
-  </script>
+  }
 
+  function onSearchTxt() {
+    $.ajax({
+      url: '../../youtube/getSearch/' + $("#txtSearch").val(), // point to server-side controller method
+      dataType: 'html', // what to expect back from the server
+      cache: false,
+      type: 'GET',
+      success: function (response) { 
+        var result = $('<div />').append(response).find('.content').html();
+        $('.content').html(result); 
+        $("article").click(function(e){
+          onPlayArticle($(this).find(".hidden-video-tag").text());
+        });            
+      },
+      error: function (response) {
+        console.log("error", $(response)) 
+      }
+    });
+  }
+
+  function copyLinkVideo() {
+    var copyText = document.getElementById("htxtVideoId");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999)
+    document.execCommand("copy");
+  }
+
+  function addToFavorite() {
+    $.ajax({
+      url: '../../youtube/addToFavorite', // point to server-side controller method
+      dataType: 'JSON', // what to expect back from the server
+      cache: false,
+      data: {
+        id:  $("#htxtVideoId").val()
+      },
+      type: 'POST',
+      success: function (response) { 
+        $('#btnRemoveFavourite').removeClass('display-none'); 
+        $('#btnAddFavourite').addClass('display-none'); 
+      },
+      error: function (response) {
+        console.log("error", $(response)) 
+      }
+    });
+  }
+  function removeToFavorite() {
+    $.ajax({
+      url: '../../youtube/removeToFavorite', // point to server-side controller method
+      dataType: 'JSON', // what to expect back from the server
+      cache: false,
+      data: {
+        id:  $("#htxtVideoId").val()
+      },
+      type: 'POST',
+      success: function (response) { 
+        $('#btnRemoveFavourite').addClass('display-none'); 
+        $('#btnAddFavourite').removeClass('display-none'); 
+      },
+      error: function (response) {
+        console.log("error", $(response)) 
+      }
+    });
+  }
+
+  function checkFavorite() {
+    $.ajax({
+      url: '../../youtube/checkFavorite/' + $("#htxtVideoId").val(), // point to server-side controller method
+      dataType: 'JSON', // what to expect back from the server
+      cache: false,
+      type: 'get',
+      success: function (response) { 
+        if(response.isAdded == true) {
+          $('#btnRemoveFavourite').removeClass('display-none'); 
+        } else {
+          $('#btnAddFavourite').removeClass('display-none'); 
+        }
+        
+      },
+      error: function (response) {
+        console.log("error", $(response)) 
+      }
+    });
+  }
+</script>
 <%- include('../layouts/footer.ejs') %>

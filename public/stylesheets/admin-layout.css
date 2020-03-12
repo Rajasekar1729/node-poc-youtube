@@ -119,6 +119,10 @@
     margin-right: 10px;
   }
 
+  article:hover {
+    cursor: pointer;
+  }
+
   .play-video-container {
     width:50%;
     float: left;

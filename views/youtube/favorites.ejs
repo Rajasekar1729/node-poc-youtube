@@ -2,9 +2,87 @@
 
 <!-- Page content -->
 <div class="content">
-    <article>
-        <h1>Favorites</h1>        
-      </article>
+  <% if (isCardType == true) { %>
+    <div class="article-card-container">
+        <% if (totalList != undefined && totalList.length > 0) { %>
+          <% totalList.forEach(function(list){ %>
+            <article class="article-card">
+                <div class="hidden-video-tag"><%= list.id.videoId != undefined ? list.id.videoId : list.id %></div>
+                <img src="<%= list.snippet.thumbnails.medium.url %>" width="<%= list.snippet.thumbnails.medium.width %>"  height="<%= list.snippet.thumbnails.medium.height %>" alt="" class="thumb">              
+                <div>
+                  <p style="font-weight: 600;"><%= list.snippet.title %></p>
+                </div>
+              </article>        
+          <% }) %>
+          <% } %>
+    </div>
+  <% } else { %> 
+    <div class="play-video-container">
+        <h4 class="font-weight-600">Play Video</h4>
+        <div>      
+            <% if (playList != undefined && playList.length == 1) { %>
+              <input type="text" style="display: none;" id="htxtVideoId"  value="<%=  playList[0].id.videoId != undefined ? playList[0].id.videoId : playList[0].id %>">
+              <iframe width="550" height="350" src="https://www.youtube.com/embed/<%= playList[0].id.videoId != undefined ? playList[0].id.videoId : playList[0].id %>" frameborder="0" allow="autoplay;encrypted=media" allowfullscreen></iframe>
+            <% } %>
+        </div>
+        <div style="float: left;">
+          <button id="btnAddFavourite" class="btn btn-success display-none" onclick="addToFavorite()">Add to Favorite</button>
+          <button id="btnRemoveFavourite" class="btn btn-danger display-none" onclick="removeToFavorite()">Remove Favorite</button>
+        </div>
+        <!-- <div style="float: right;margin-right: 17px;">
+          <button class="btn btn-link" onclick="copyLinkVideo()">
+            Copy Link
+          </button>
+        </div> -->
+    </div>        
+    <div class="related-video-container">
+      <h4 class="font-weight-600">Related Video List:</h4>
+      <div class="related-video-content">
+        <% if (relatedList != undefined && relatedList.length > 0) { %>
+          <% relatedList.forEach(function(list){ %>
+            <article class="article-content">
+              <div class="hidden-video-tag"><%= list.id.videoId != undefined ? list.id.videoId : list.id %></div>
+              <img src="<%= list.snippet.thumbnails.default.url %>" width="<%= list.snippet.thumbnails.default.width %>"  height="<%= list.snippet.thumbnails.default.height %>" alt="" class="thumb article-img">              
+              <div>
+                <p style="font-weight: 600;"><%= list.snippet.title %></p>
+                <p class="video-description"><%= list.snippet.description %></p>
+              </div>
+            </article>
+          <% }) %>
+          <% } %>
+        </div>      
+    </div>
+  <% }  %> 
+  <input type="hidden" id="videoTotalList"  value="<%= JSON.stringify(totalList) %>">
 </div>
+<script>
+  $(document).ready(function () {        
+      $("article").click(function(e){
+        onPlayArticle($(this).find(".hidden-video-tag").text());
+      });           
+  });
 
+  function onPlayArticle(videoId) {
+      $.ajax({
+          url: '../../youtube/playHome', // point to server-side controller method
+          dataType: 'html', // what to expect back from the server
+          cache: false,
+          data: {
+            searchVideo: videoId,
+            videoTotalList: $("#videoTotalList").val()
+          },
+          type: 'POST',
+          success: function (response) { 
+            var result = $('<div />').append(response).find('.content').html();
+            $('.content').html(result); 
+            $("article").click(function(e){
+              onPlayArticle($(this).find(".hidden-video-tag").text());
+            });      
+          },
+          error: function (response) {
+            console.log("error", $(response)) 
+          }
+        });
+  }
+</script>
 <%- include('../layouts/footer.ejs') %>
