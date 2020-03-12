@@ -112,9 +112,11 @@ youtubeController.getHome = (req, res) => {
   let service = google.youtube('v3');
   service.videos.list({
     auth: authGlobal,
-    part: "snippet,contentDetails,statistics",
+    part: "snippet",
     chart: "mostPopular",
-    regionCode: "US"
+    regionCode: "US",
+    h1: "en",
+    maxResults: 20
   }, (err, results) => {
     let dataItems = [], firstList = [], otherList = [];
     if(results != undefined) {
@@ -205,7 +207,7 @@ youtubeController.getSearchVideo = (req, res) => {
     part: 'snippet',    
     q: req.params.id,
     type: 'video',
-    maxResults: 25,
+    maxResults: 20,
   }, (err, results) => {
     let dataItems = [], firstList = [], otherList = [];
     if(results != undefined) {
@@ -229,11 +231,15 @@ youtubeController.getSearchVideo = (req, res) => {
 
 youtubeController.getLangugeVideo = (req, res) => {
   let service = google.youtube('v3');
+  req.session.LoggedIn["language"] = req.params.id;
+  req.session.LoggedIn["region"] = req.params.id == "ta" ? "IN" : "US";
   service.videos.list({
     auth: authGlobal,
-    part: 'snippet',    
-    hl: req.params.id,
-    regionCode: req.params.id == "ta" ? "IN" : "US"
+    part: 'snippet',
+    regionCode: req.params.id == "ta" ? "IN" : "US",
+    chart: "mostPopular",
+    h1: req.params.id,
+    maxResults: req.params.id == "ta" ? 10 : 20
   }, (err, results) => {
     let dataItems = [], firstList = [], otherList = [];
     if(results != undefined) {
@@ -248,9 +254,9 @@ youtubeController.getLangugeVideo = (req, res) => {
           }       
         }
       }      
-      res.render('./youtube/home', {title: 'Home', errorDescription: '', isCardType: ((req.session.LoggedIn["isCardType"] != undefined && req.session.LoggedIn["isCardType"] == false) ? false : true), totalList: dataItems, relatedList: otherList, playList: firstList});
+      res.render('./youtube/home', {title: 'Home', errorDescription: '', isCardType: true, totalList: dataItems, relatedList: otherList, playList: firstList});
     }  else {
-      res.render('./youtube/home', {title: 'Home', errorDescription: 'Error On youtube integration.', isCardType: ((req.session.LoggedIn["isCardType"] != undefined && req.session.LoggedIn["isCardType"] == false) ? false : true), totalList: dataItems, relatedList: otherList, playList: firstList});
+      res.render('./youtube/home', {title: 'Home', errorDescription: 'No Record to show..', isCardType: true, totalList: dataItems, relatedList: otherList, playList: firstList});
     }   
   });
 };
