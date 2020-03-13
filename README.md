@@ -25,3 +25,5 @@ Reference Link:
 * [Learn Google youtube api integration](https://developers.google.com/youtube/v3/getting-started).
 * [Learn how to use sequlize](https://sequelize.readthedocs.io/en/latest/docs/getting-started/).
 * [Learn Sequelize + Express Starter Guide](https://gist.github.com/vapurrmaid/a111bf3fc0224751cb2f76532aac2465).
+* [Creating a simple website with Node.js, Express and EJS view engine](https://medium.com/@bhanushali.mahesh3/creating-a-simple-website-with-node-js-express-and-ejs-view-engine-856382a4578f).
+
