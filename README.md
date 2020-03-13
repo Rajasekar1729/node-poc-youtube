@@ -18,10 +18,9 @@ Youtube - POC
 Note : All Poc should have a admin user panel for user management and other configuration all should be configured dynamically without any hardcode.
 
 
-
-
 Reference Link:
 ---------------
+* [Screenshots Document for reference](https://docs.google.com/document/d/1JMUXv0K5e1T4KAsxqJxSNNeGi8T7nl5NYHOlK9Frm9s/edit).
 * [Learn Google youtube api integration](https://developers.google.com/youtube/v3/getting-started).
 * [Learn how to use sequlize](https://sequelize.readthedocs.io/en/latest/docs/getting-started/).
 * [Learn Sequelize + Express Starter Guide](https://gist.github.com/vapurrmaid/a111bf3fc0224751cb2f76532aac2465).
