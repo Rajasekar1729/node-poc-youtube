@@ -177,6 +177,13 @@ function generateOTP(user,res, page) {
   let newUuid = uuidv4();
   
   let subject = "OTP";
+  
+  if(page == "index") {
+    subject = "OTP for Login";
+  } else if(page == "forget") {
+    subject = "OTP for Reset Password";
+  }
+
   let content = "Test Mail";
 
   if(page == "index") {
@@ -240,7 +247,7 @@ userController.load2f2Login = (req, res) => {
       }
     }).then(function(dataObj) {               
       if(dataObj.length > 0) {
-        req.session.destroy();
+        //req.session.destroy();
         models.OTPEntries.findAll({
           raw: true,
           where: {
@@ -316,6 +323,7 @@ async function isValidUsername(username) {
 userController.forgetPassword = async (req, res) => {
   let users = await models.User.findAll({raw: true, where: { email: req.body.email }});
   if(users.length > 0) {
+    req.session.LoggedIn = users[0];
     generateOTP(users[0],res, "forget"); 
   } else {
     res.render('forget-password', { title: 'Forget Password', IsError: true, ErrorDescription: "Unable to Reset Password Please vaild E-mail."});
@@ -404,7 +412,8 @@ userController.resetPassword = (req, res) => {
       console.log(err);
       res.render('reset-password', { title: 'Reset Password', IsOTPValidated: true, ErrorDescription: "Please try again later"});
     } else {
-      res.redirect("/home");
+      req.session.destroy();
+      res.redirect("/");
     }    
   });
 };
